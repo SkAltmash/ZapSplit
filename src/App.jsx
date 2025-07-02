@@ -13,6 +13,9 @@ import PayUser from './pages/PayUser';
 import PaymentProcessing from './pages/PaymentProcessing';
 import PaymentResult from './pages/PaymentResult';
 import TransactionDetails from './pages/TransactionDetails';
+import PayMobile from './pages/PayMobile';
+import PayUpiId from './pages/PayUpiId';
+import ProfilePage from './pages/ProfilePage';
 function App() {
   return (
     <>
@@ -30,8 +33,10 @@ function App() {
      <Route path="/pay/:userId/processing" element={<PaymentProcessing />} />
        <Route path="/payment-result" element={<PaymentResult />} />
       <Route path="/transaction/:id" element={<TransactionDetails />} />
-
-    </Routes>
+      <Route path="/pay-mobile" element={<PayMobile />} />
+      <Route path="/pay-id" element={<PayUpiId />} />
+      <Route path="/profile" element={<ProfilePage />} />
+  </Routes>
     </>
   );
 }
