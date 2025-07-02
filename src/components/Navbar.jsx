@@ -3,7 +3,7 @@ import { FiMenu, FiX, FiMoon, FiSun } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { auth } from "../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-
+import { Link } from "react-router-dom";
 const Navbar = () => {
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("theme") === "dark"
@@ -55,11 +55,13 @@ const Navbar = () => {
               </>
             ) : (
               <>
+              <Link to="/profile" className="flex items-center gap-2">
                 <img
                   src={user.photoURL || "https://i.pravatar.cc/100"}
                   alt="avatar"
                   className="w-8 h-8 rounded-full object-cover"
                 />
+              </Link>
                 <button
                   onClick={handleLogout}
                   className="text-sm font-medium text-gray-700 dark:text-gray-300 px-4 py-1.5 rounded-lg border border-gray-300 dark:border-white/20 hover:border-red-500 dark:hover:border-red-400 transition"
@@ -136,8 +138,25 @@ const Navbar = () => {
                         {user.displayName || "User"}
                       </p>
                       <p className="text-xs text-gray-500">{user.email}</p>
+                      
+   
                     </div>
                   </div>
+                  <div className="border-t border-gray-200 dark:border-white/10 my-4" />
+                  <Link
+                    to="/profile"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
+                    onClick={toggleDrawer}
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="/scan-pay"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
+                    onClick={toggleDrawer}
+                  >
+                  Scan & Pay
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="text-sm font-medium text-red-600 border border-red-300 dark:border-red-400 px-4 py-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-800/20 transition"

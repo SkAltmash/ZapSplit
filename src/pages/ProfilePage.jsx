@@ -13,16 +13,21 @@ const ProfilePage = () => {
   const [editField, setEditField] = useState(null); // 'name', 'upi', 'zupPin'
   const [editValue, setEditValue] = useState("");
   const [saving, setSaving] = useState(false);
-  const user = auth.currentUser;
 
   useEffect(() => {
-    if (!user?.uid) return;
-    const fetchData = async () => {
-      const snap = await getDoc(doc(db, "users", user.uid));
-      if (snap.exists()) setUserData(snap.data());
-    };
-    fetchData();
-  }, [user]);
+    const unsubscribe = auth.onAuthStateChanged(async (u) => {
+      if (!u) return;
+      try {
+        const snap = await getDoc(doc(db, "users", u.uid));
+        if (snap.exists()) setUserData(snap.data());
+        else toast.error("User data not found");
+      } catch (err) {
+        toast.error("Failed to load profile");
+        console.error(err);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const openEditModal = (field) => {
     setEditField(field);
@@ -42,6 +47,7 @@ const ProfilePage = () => {
 
     try {
       setSaving(true);
+      const user = auth.currentUser;
       await updateDoc(doc(db, "users", user.uid), {
         [editField]: editValue,
         updatedAt: new Date(),
@@ -56,10 +62,21 @@ const ProfilePage = () => {
     }
   };
 
+  // ✅ Skeleton loader
   if (!userData) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-600 dark:text-white bg-white dark:bg-[#0d0d0d]">
-        Loading profile...
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0d0d0d] px-4">
+        <div className="max-w-md w-full p-6 space-y-4 animate-pulse">
+          <div className="w-20 h-20 mx-auto rounded-full bg-gray-300 dark:bg-gray-700" />
+          <div className="h-5 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mx-auto" />
+          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-2/3 mx-auto" />
+          <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded" />
+          <div className="space-y-2">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-4 bg-gray-300 dark:bg-gray-700 rounded" />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -121,12 +138,18 @@ const ProfilePage = () => {
           </div>
           <div className="flex justify-between">
             <span className="text-gray-500 dark:text-gray-400">Joined</span>
-            <span>{format(userData.createdAt.toDate(), "PPP p")}</span>
-          </div>
+<span>
+  {userData.createdAt && typeof userData.createdAt.toDate === "function"
+    ? format(userData.createdAt.toDate(), "PPP p")
+    : "-"}
+</span>          </div>
           <div className="flex justify-between">
             <span className="text-gray-500 dark:text-gray-400">Last Updated</span>
-            <span>{format(userData.updatedAt.toDate(), "PPP p")}</span>
-          </div>
+<span>
+  {userData.updatedAt && typeof userData.updatedAt.toDate === "function"
+    ? format(userData.updatedAt.toDate(), "PPP p")
+    : "-"}
+</span>          </div>
         </div>
 
         {/* QR Code */}
@@ -141,7 +164,7 @@ const ProfilePage = () => {
         )}
       </div>
 
-      {/* Modal Backdrop + Animation */}
+      {/* Modal */}
       <AnimatePresence>
         {editField && (
           <>
@@ -157,7 +180,7 @@ const ProfilePage = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: "spring", duration: 0.3 }}
-              className="fixed z-50 mt-50 bg-white dark:bg-[#1a1a1a] p-6 rounded-lg shadow-lg w-80"
+              className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-[#1a1a1a] p-6 rounded-lg shadow-lg w-80"
             >
               <h3 className="text-lg font-semibold mb-3 capitalize">Edit {editField}</h3>
               <input

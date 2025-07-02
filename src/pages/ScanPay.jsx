@@ -100,7 +100,7 @@ const ScanPay = () => {
   };
 
   return (
-    <div className="min-h-screen px-4 py-10 bg-white dark:bg-[#0d0d0d] text-gray-800 dark:text-white flex flex-col items-center">
+    <div className="min-h-screen mt-12 px-4 py-10 bg-white dark:bg-[#0d0d0d] text-gray-800 dark:text-white flex flex-col items-center">
       <div className="max-w-sm w-full bg-white dark:bg-[#1a1a1a] p-6 rounded-xl shadow-md border dark:border-white/10">
         <h2 className="text-xl font-semibold mb-4 text-center">Scan & Pay</h2>
 
