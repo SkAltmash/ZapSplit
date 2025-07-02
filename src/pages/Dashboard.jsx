@@ -14,7 +14,7 @@ import { Dialog } from "@headlessui/react";
 import { toast } from "react-hot-toast";
 import RecentTransactions from "../components/RecentTransactions";
 import { useNavigate } from "react-router-dom";
-
+import Footer from "../components/Footer";
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [balance, setBalance] = useState(0);
@@ -233,7 +233,8 @@ const Dashboard = () => {
           <RecentTransactions />
 
     </div>
-   </>
+    <Footer />
+   </>  
   );
 };
 

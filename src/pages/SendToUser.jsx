@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import {
@@ -19,29 +19,26 @@ const SendToUser = () => {
   const [transactions, setTransactions] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
 
+  const scrollRef = useRef(null);
+
   useEffect(() => {
     const unsub = auth.onAuthStateChanged(async (u) => {
       if (u) {
         setCurrentUser(u);
 
         try {
-          // Fetch recipient data first
           const snap = await getDoc(doc(db, "users", userId));
           if (snap.exists()) {
             const rec = { id: snap.id, ...snap.data() };
             setRecipient(rec);
 
-            // Fetch transactions between current user and recipient
             const txnRef = collection(db, "users", u.uid, "transactions");
             const q = query(txnRef, orderBy("timestamp", "asc"));
             const snapTxn = await getDocs(q);
 
             const filtered = snapTxn.docs
               .map((doc) => doc.data())
-              .filter(
-                (txn) =>
-                  txn.to === rec.email || txn.from === rec.email
-              );
+              .filter((txn) => txn.to === rec.email || txn.from === rec.email);
 
             setTransactions(filtered);
           } else {
@@ -55,6 +52,13 @@ const SendToUser = () => {
 
     return () => unsub();
   }, [userId, navigate]);
+
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [transactions]);
 
   if (!recipient || !currentUser) return <div className="p-6">Loading...</div>;
 
@@ -84,33 +88,42 @@ const SendToUser = () => {
         </div>
       </div>
 
-      {/* Chat style transaction list */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      {/* Transactions List */}
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto p-4 space-y-3 scroll-smooth"
+      >
         {transactions.map((txn, i) => {
           const isSent = txn.type === "send";
+          const isFailed = txn.status === "failed";
+
           return (
-            <div
-              key={i}
-              className={`flex ${isSent ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`rounded-xl px-4 py-2 max-w-[70%] text-sm shadow ${
-                  isSent
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-200 dark:bg-[#2a2a2a] text-gray-800 dark:text-white"
-                }`}
-              >
-                <p className="font-bold">₹{Math.abs(txn.amount)}</p>
-                {txn.note && (
-                  <p className="text-xs mt-1 opacity-80">{txn.note}</p>
-                )}
-                <p className="text-[10px] text-right mt-1 opacity-60">
-                  {formatDistanceToNow(new Date(txn.timestamp?.toDate?.()), {
-                    addSuffix: true,
-                  })}
-                </p>
-              </div>
-            </div>
+           <div
+  key={i}
+  className={`flex ${isSent ? "justify-end" : "justify-start"}`}
+>
+  <div
+    onClick={() => navigate(`/transaction/${txn.id}`, { state: txn })}
+    className={`cursor-pointer rounded-xl px-4 py-2 max-w-[70%] text-sm shadow border transition-transform hover:scale-[1.02] ${
+      isFailed
+        ? "bg-red-100 border-red-400 text-red-700 dark:bg-red-900 dark:text-red-200"
+        : isSent
+        ? "bg-purple-600 text-white border-purple-500"
+        : "bg-gray-200 dark:bg-[#2a2a2a] text-gray-800 dark:text-white border-transparent"
+    }`}
+  >
+    <p className="font-bold">₹{Math.abs(txn.amount)}</p>
+    {txn.note && (
+      <p className="text-xs mt-1 opacity-80 break-words">{txn.note}</p>
+    )}
+    <p className="text-[10px] text-right mt-1 opacity-60">
+      {formatDistanceToNow(new Date(txn.timestamp?.toDate?.()), {
+        addSuffix: true,
+      })}
+    </p>
+  </div>
+</div>
+
           );
         })}
       </div>

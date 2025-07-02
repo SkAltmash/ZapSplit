@@ -15,8 +15,9 @@ import {
   FiArrowDownLeft,
   FiLoader,
 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 const typeIcon = {
   add: <FiPlusCircle className="text-green-500 text-xl" />,
@@ -32,33 +33,27 @@ const RecentTransactions = () => {
   const [hasMore, setHasMore] = useState(true);
   const [filterType, setFilterType] = useState("all");
 
+  const navigate = useNavigate();
   const user = auth.currentUser;
 
   const fetchTransactions = async (isFirst = false) => {
     if (!user) return;
-
     try {
       isFirst ? setLoading(true) : setMoreLoading(true);
 
       const baseRef = collection(db, "users", user.uid, "transactions");
-      let q;
+
+      let q = query(baseRef, orderBy("timestamp", "desc"));
 
       if (filterType !== "all") {
-        q = query(
-          baseRef,
-          where("type", "==", filterType),
-          orderBy("timestamp", "desc"),
-          ...(lastDoc ? [startAfter(lastDoc)] : []),
-          limit(PAGE_SIZE)
-        );
-      } else {
-        q = query(
-          baseRef,
-          orderBy("timestamp", "desc"),
-          ...(lastDoc ? [startAfter(lastDoc)] : []),
-          limit(PAGE_SIZE)
-        );
+        q = query(baseRef, where("type", "==", filterType), orderBy("timestamp", "desc"));
       }
+
+      if (!isFirst && lastDoc) {
+        q = query(q, startAfter(lastDoc));
+      }
+
+      q = query(q, limit(PAGE_SIZE));
 
       const snap = await getDocs(q);
       const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -77,6 +72,7 @@ const RecentTransactions = () => {
   useEffect(() => {
     setTransactions([]);
     setLastDoc(null);
+    setHasMore(true);
     fetchTransactions(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterType]);
@@ -118,16 +114,19 @@ const RecentTransactions = () => {
           {transactions.map((tx) => (
             <div
               key={tx.id}
-              className="flex items-center justify-between p-4 bg-white dark:bg-[#1a1a1a] border rounded-xl shadow-sm"
+              onClick={() => navigate(`/transaction/${tx.id}`, { state: tx })}
+              className="flex items-center justify-between p-4 bg-white dark:bg-[#1a1a1a] border rounded-xl shadow-sm hover:shadow-md transition cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 {typeIcon[tx.type] || (
                   <FiPlusCircle className="text-gray-400 text-xl" />
                 )}
                 <div>
-                  <p className="font-medium">{tx.note || tx.type}</p>
+                  <p className="font-medium truncate max-w-[200px]">
+                    {tx.note || tx.type}
+                  </p>
                   <p className="text-xs text-gray-500">
-                    {tx.upi} • {formatDate(tx.timestamp)}
+                    {tx.to || tx.from || tx.email || "—"} • {formatDate(tx.timestamp)}
                   </p>
                 </div>
               </div>

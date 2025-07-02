@@ -7,15 +7,17 @@ import Login from './pages/Login';
 import Homepage from './pages/Homepage';
 import LearnMore from './pages/LearnMore';
 import Success from './pages/Success';
-import Footer from './components/Footer';
 import Send from './pages/Send';
 import SendToUser from './pages/SendToUser';
 import PayUser from './pages/PayUser';
+import PaymentProcessing from './pages/PaymentProcessing';
+import PaymentResult from './pages/PaymentResult';
+import TransactionDetails from './pages/TransactionDetails';
 function App() {
   return (
     <>
     <Navbar />
-     <Routes>
+     <Routes className="min-h-[calc(100vh-3rem)] flex flex-col bg-gray-100 dark:bg-[#0d0d0d]">
      <Route path="/" element={<Homepage />} />
      <Route path="/learn-more" element={<LearnMore />} />
       <Route path="/signup" element={<Signup />} />
@@ -25,9 +27,11 @@ function App() {
       <Route path="/send" element={<Send />} />
       <Route path="/send/:userId" element={<SendToUser />} />
       <Route path="/pay/:userId" element={<PayUser />} />
+     <Route path="/pay/:userId/processing" element={<PaymentProcessing />} />
+       <Route path="/payment-result" element={<PaymentResult />} />
+      <Route path="/transaction/:id" element={<TransactionDetails />} />
 
     </Routes>
-    <Footer />
     </>
   );
 }
