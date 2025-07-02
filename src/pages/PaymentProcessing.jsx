@@ -52,78 +52,84 @@ const PaymentProcessing = () => {
   }, [user, userId, state, navigate]);
 
   const handleConfirm = async () => {
-    if (!pin || pin.length !== 4) {
-      toast.error("Please enter a valid 4-digit PIN");
+    if (!user || !recipient || !state.amount || !pin) return;
+    if (pin.length !== 4) {
+      toast.error("PIN must be 4 digits");
       return;
     }
-    if (pin !== storedPin) {
-      await logFailedTransaction("Incorrect PIN");
-      return navigate("/payment-result", {
-        state: {
-          status: "failed",
-          reason: "Incorrect PIN",
-          amount: state.amount,
-          recipientName: recipient?.name || "",
-          recipientId: recipient?.id,
-        },
-      });
-    }
-
     setProcessing(true);
+
+    const userRef = doc(db, "users", user.uid);
+    const recipientRef = doc(db, "users", userId);
+    const txnId = `txn_${Date.now()}`;
+    const now = new Date();
+    const amount = Number(state.amount);
+
     try {
-      const amount = Number(state.amount);
-      const note = state.note || "Sent via ZapSplit";
-      const now = new Date();
-      const txnId = doc(collection(db, "dummy")).id;
-
       await runTransaction(db, async (transaction) => {
-        const senderRef = doc(db, "users", user.uid);
-        const recipientRef = doc(db, "users", userId);
+        const senderSnap = await transaction.get(userRef);
+        const receiverSnap = await transaction.get(recipientRef);
 
-        const [senderSnap, recipientSnap] = await Promise.all([
-          transaction.get(senderRef),
-          transaction.get(recipientRef),
-        ]);
-
-        const sender = senderSnap.data();
-        const recipient = recipientSnap.data();
-
-        if (sender.wallet < amount) {
-          throw new Error("Insufficient Balance");
+        if (!senderSnap.exists() || !receiverSnap.exists()) {
+          throw new Error("User not found");
         }
 
-        // Wallet updates
-        transaction.update(senderRef, { wallet: sender.wallet - amount });
+        const sender = senderSnap.data();
+        const receiver = receiverSnap.data();
+
+        // ✅ PIN check
+        if (sender.zupPin !== pin) {
+          throw new Error("Incorrect PIN");
+        }
+
+        // ✅ Balance check
+        if (sender.wallet < amount) {
+          throw new Error("Insufficient balance");
+        }
+
+        // ✅ Update balances
+        transaction.update(userRef, {
+          wallet: sender.wallet - amount,
+          updatedAt: now,
+        });
         transaction.update(recipientRef, {
-          wallet: (recipient.wallet || 0) + amount,
+          wallet: (receiver.wallet || 0) + amount,
+          updatedAt: now,
         });
 
-        // Transaction refs
-        const senderTxnRef = doc(db, "users", user.uid, "transactions", txnId);
-        const recipientTxnRef = doc(db, "users", userId, "transactions", txnId);
-
-        // Save transactions with txnId
-        transaction.set(senderTxnRef, {
+        // ✅ Record sender's transaction
+        transaction.set(doc(db, `users/${user.uid}/transactions`, txnId), {
           id: txnId,
-          type: "send",
-          to: recipient.email,
-          amount: -amount,
-          note,
-          timestamp: now,
-          status: "success",
-        });
-
-        transaction.set(recipientTxnRef, {
-          id: txnId,
-          type: "receive",
-          from: sender.email,
+          to: userId,
           amount,
-          note,
-          timestamp: now,
-          status: "success",
+          type: "sent",
+          createdAt: now,
+          note: state.note || "",
+        });
+
+        // ✅ Record recipient's transaction
+        transaction.set(doc(db, `users/${userId}/transactions`, txnId), {
+          id: txnId,
+          from: user.uid,
+          amount,
+          type: "received",
+          createdAt: now,
+          note: state.note || "",
         });
       });
 
+      // ✅ In-app notification for recipient
+      await setDoc(doc(collection(db, "users", userId, "notifications")), {
+        id: txnId,
+        message: `You received ₹${amount} from ${user.email}`,
+        from: user.email,
+        amount,
+        seen: false,
+        timestamp: now,
+        type: "receive",
+      });
+
+      // ✅ Redirect to payment result page
       navigate("/payment-result", {
         state: {
           status: "success",
@@ -135,11 +141,13 @@ const PaymentProcessing = () => {
         },
       });
     } catch (err) {
-      await logFailedTransaction(err.message || "Transaction Failed");
+      console.error("Payment error:", err);
+      toast.error(err.message || "Payment failed");
+
       navigate("/payment-result", {
         state: {
           status: "failed",
-          reason: err.message || "Transaction Failed",
+          reason: err.message || "Payment failed",
           amount: state.amount,
           recipientName: recipient?.name || "",
           recipientId: recipient?.id,

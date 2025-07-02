@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { auth } from "../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { Link } from "react-router-dom";
+import Notifications from "./Notifications";
 const Navbar = () => {
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("theme") === "dark"
@@ -68,6 +69,8 @@ const Navbar = () => {
                 >
                   Logout
                 </button>
+                                                       <Notifications />
+
               </>
             )}
             <button
@@ -83,12 +86,14 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Icon */}
+          
           <button
             className="md:hidden text-2xl text-gray-700 dark:text-gray-300"
             onClick={toggleDrawer}
           >
             {drawerOpen ? <FiX /> : <FiMenu />}
           </button>
+           
         </div>
       </nav>
 
@@ -139,9 +144,11 @@ const Navbar = () => {
                       </p>
                       <p className="text-xs text-gray-500">{user.email}</p>
                       
-   
+
                     </div>
                   </div>
+                                                                   <Notifications />
+
                   <div className="border-t border-gray-200 dark:border-white/10 my-4" />
                   <Link
                     to="/profile"
@@ -150,6 +157,7 @@ const Navbar = () => {
                   >
                     Profile
                   </Link>
+
                   <Link
                     to="/scan-pay"
                     className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
