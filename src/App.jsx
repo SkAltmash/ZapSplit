@@ -17,6 +17,7 @@ import PayMobile from './pages/PayMobile';
 import PayUpiId from './pages/PayUpiId';
 import ProfilePage from './pages/ProfilePage';
 import ScanPay from './pages/ScanPay';
+import NotificationsPage from './pages/NotificationsPage';
 function App() {
   return (
     <>
@@ -38,6 +39,7 @@ function App() {
       <Route path="/pay-id" element={<PayUpiId />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/scan-pay" element={<ScanPay />} />
+      <Route path="/notifications" element={<NotificationsPage />} />
   </Routes>
     </>
   );

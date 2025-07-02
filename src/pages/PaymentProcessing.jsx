@@ -119,15 +119,16 @@ const PaymentProcessing = () => {
       });
 
       // ✅ In-app notification for recipient
-      await setDoc(doc(collection(db, "users", userId, "notifications")), {
-        id: txnId,
-        message: `You received ₹${amount} from ${user.email}`,
-        from: user.email,
-        amount,
-        seen: false,
-        timestamp: now,
-        type: "receive",
-      });
+   await setDoc(doc(db, "users", userId, "notifications", txnId), {
+  id: txnId,
+  message: `You received ₹${amount} from ${user.email}`,
+  from: user.email,
+  amount,
+  seen: false,
+  timestamp: now,
+  type: "receive",
+});
+
 
       // ✅ Redirect to payment result page
       navigate("/payment-result", {
