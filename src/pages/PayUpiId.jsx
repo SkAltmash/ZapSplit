@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import {
@@ -18,8 +18,36 @@ const PayUpiId = () => {
   const [name, setName] = useState("");
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [userList, setUserList] = useState([]);
+  const [userLoading, setUserLoading] = useState(true);
 
   const navigate = useNavigate();
+  const currentUser = auth.currentUser;
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const snap = await getDocs(collection(db, "users"));
+        const filtered = snap.docs
+          .filter(
+            (doc) =>
+              doc.id !== currentUser?.uid &&
+              !doc.data().isGhost &&
+              doc.data().upi
+          )
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .slice(0, 20);
+
+        setUserList(filtered);
+      } catch (err) {
+        console.error("Error fetching users:", err);
+      } finally {
+        setUserLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [currentUser]);
 
   const handleNext = async () => {
     if (!upi || !upi.includes("@")) {
@@ -69,7 +97,7 @@ const PayUpiId = () => {
   };
 
   return (
-    <div className="min-h-screen px-4 py-8 bg-white dark:bg-[#0d0d0d] text-center text-gray-800 dark:text-white flex flex-col items-center justify-center">
+    <div className="min-h-screen px-4 mt-12 py-8 bg-white dark:bg-[#0d0d0d] text-center text-gray-800 dark:text-white flex flex-col items-center justify-center">
       <div className="max-w-sm w-full bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 p-6 rounded-2xl shadow-xl">
         <h2 className="text-2xl font-semibold mb-4">Send Money via UPI ID</h2>
 
@@ -91,10 +119,50 @@ const PayUpiId = () => {
             <button
               onClick={handleNext}
               disabled={loading}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 rounded-md"
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 rounded-md mb-4"
             >
               {loading ? "Checking..." : "Next"}
             </button>
+
+            {/* Show user list */}
+            <ul className="text-left space-y-2 max-h-60 overflow-y-auto text-sm">
+              {userLoading ? (
+                [...Array(5)].map((_, i) => (
+                  <li
+                    key={i}
+                    className="flex items-center gap-3 animate-pulse bg-gray-100 dark:bg-[#2a2a2a] px-3 py-2 rounded-md"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-[#3a3a3a]" />
+                    <div className="flex-1 space-y-1">
+                      <div className="h-3 w-24 bg-gray-300 dark:bg-[#3a3a3a] rounded" />
+                      <div className="h-2 w-16 bg-gray-300 dark:bg-[#3a3a3a] rounded" />
+                    </div>
+                  </li>
+                ))
+              ) : userList.length > 0 ? (
+                userList.map((u) => (
+                  <li
+                    key={u.id}
+                    onClick={() => navigate(`/send/${u.id}`)}
+                    className="flex items-center gap-3 bg-gray-100 dark:bg-[#2a2a2a] hover:bg-gray-200 dark:hover:bg-[#333] px-3 py-2 rounded-md cursor-pointer transition"
+                  >
+                    <img
+                      src={u.photoURL}
+                      alt={u.name}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <div>
+                      <p className="font-medium">{u.name}</p>
+                      <p className="text-xs text-gray-500">{u.upi}</p>
+                    </div>
+                  </li>
+                ))
+              ) : (
+                <li className="text-xs text-gray-400 text-center py-2">
+                  No users found
+                </li>
+              )}
+            </ul>
           </>
         ) : (
           <>
@@ -115,6 +183,8 @@ const PayUpiId = () => {
             >
               Continue <FiChevronRight />
             </button>
+
+            <p className="text-xs mt-3 text-gray-400">UPI: {upi}</p>
           </>
         )}
       </div>

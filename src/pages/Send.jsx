@@ -113,34 +113,44 @@ const Send = () => {
           ))}
         </div>
       )}
+{/* Other Options */}
+<h2 className="text-lg font-semibold mb-3">Other Options</h2>
+<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
-      {/* Other Options */}
-      <h2 className="text-lg font-semibold mb-3">Other Options</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <button
-          onClick={() => navigate("/pay-mobile")}
-          className="bg-white dark:bg-[#1a1a1a] border p-4 rounded-xl flex flex-col items-center shadow hover:shadow-md"
-        >
-          <FiPhone className="text-3xl text-purple-600 dark:text-purple-400 mb-2" />
-          <span className="text-sm">Pay by Mobile</span>
-        </button>
+  {/* Pay by Mobile */}
+  <button
+    onClick={() => navigate("/pay-mobile")}
+    className="group bg-purple-50 dark:bg-[#1b1327] border border-purple-200 dark:border-purple-800 p-5 rounded-xl shadow transition hover:shadow-lg hover:scale-[1.02] flex flex-col items-center"
+  >
+    <div className="bg-purple-100 dark:bg-purple-800 text-purple-600 dark:text-purple-200 rounded-full p-3 mb-3">
+      <FiPhone className="text-2xl" />
+    </div>
+    <span className="text-sm font-medium text-gray-800 dark:text-gray-200">Pay by Mobile</span>
+  </button>
 
-        <button
-          onClick={() => navigate("/pay-id")}
-          className="bg-white dark:bg-[#1a1a1a] border p-4 rounded-xl flex flex-col items-center shadow hover:shadow-md"
-        >
-          <FiAtSign className="text-3xl text-purple-600 dark:text-purple-400 mb-2" />
-          <span className="text-sm">Pay by UPI ID</span>
-        </button>
+  {/* Pay by UPI ID */}
+  <button
+    onClick={() => navigate("/pay-id")}
+    className="group bg-green-50 dark:bg-[#13271b] border border-green-200 dark:border-green-800 p-5 rounded-xl shadow transition hover:shadow-lg hover:scale-[1.02] flex flex-col items-center"
+  >
+    <div className="bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-200 rounded-full p-3 mb-3">
+      <FiAtSign className="text-2xl" />
+    </div>
+    <span className="text-sm font-medium text-gray-800 dark:text-gray-200">Pay by UPI ID</span>
+  </button>
 
-        <button
-          onClick={() => navigate("/scan-pay")}
-          className="bg-white dark:bg-[#1a1a1a] border p-4 rounded-xl flex flex-col items-center shadow hover:shadow-md"
-        >
-          <FiCamera className="text-3xl text-purple-600 dark:text-purple-400 mb-2" />
-          <span className="text-sm">Scan & Pay</span>
-        </button>
-      </div>
+  {/* Scan & Pay */}
+  <button
+    onClick={() => navigate("/scan-pay")}
+    className="group bg-blue-50 dark:bg-[#13202b] border border-blue-200 dark:border-blue-800 p-5 rounded-xl shadow transition hover:shadow-lg hover:scale-[1.02] flex flex-col items-center"
+  >
+    <div className="bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-200 rounded-full p-3 mb-3">
+      <FiCamera className="text-2xl" />
+    </div>
+    <span className="text-sm font-medium text-gray-800 dark:text-gray-200">Scan & Pay</span>
+  </button>
+</div>
+
     </div>
   );
 };

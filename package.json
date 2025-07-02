@@ -16,6 +16,7 @@
     "date-fns": "^4.1.0",
     "firebase": "^11.9.1",
     "framer-motion": "^12.19.2",
+    "html5-qrcode": "^2.3.8",
     "node-fetch": "^2.7.0",
     "qrcode.react": "^4.2.0",
     "razorpay": "^2.9.6",
