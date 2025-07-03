@@ -1,13 +1,47 @@
 import React from 'react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-
-const App = () => {
+import { Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Signup from './pages/Signup';
+import ProfileSetup from './pages/ProfileSetup';
+import Login from './pages/Login';
+import Homepage from './pages/Homepage';
+import LearnMore from './pages/LearnMore';
+import Success from './pages/Success';
+import Send from './pages/Send';
+import SendToUser from './pages/SendToUser';
+import PayUser from './pages/PayUser';
+import PaymentProcessing from './pages/PaymentProcessing';
+import PaymentResult from './pages/PaymentResult';
+import TransactionDetails from './pages/TransactionDetails';
+import PayMobile from './pages/PayMobile';
+import PayUpiId from './pages/PayUpiId';
+import ProfilePage from './pages/ProfilePage';
+import ScanPay from './pages/ScanPay';
+import NotificationsPage from './pages/NotificationsPage';
+function App() {
   return (
-    <DotLottieReact
-      src="https://lottie.host/2c7dc4a3-1a36-44ee-b503-e363d6e3402b/bEaEYqvnj3.lottie"
-      
-      autoplay
-    />
+    <>
+    <Navbar />
+     <Routes className="min-h-[calc(100vh-3rem)] flex flex-col bg-gray-100 dark:bg-[#0d0d0d]">
+     <Route path="/" element={<Homepage />} />
+     <Route path="/learn-more" element={<LearnMore />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/profile-setup" element={<ProfileSetup />} />
+      <Route path="/login" element ={<Login /> }/>
+      <Route path='/success' element={<Success />} />
+      <Route path="/send" element={<Send />} />
+      <Route path="/send/:userId" element={<SendToUser />} />
+      <Route path="/pay/:userId" element={<PayUser />} />
+     <Route path="/pay/:userId/processing" element={<PaymentProcessing />} />
+       <Route path="/payment-result" element={<PaymentResult />} />
+      <Route path="/transaction/:id" element={<TransactionDetails />} />
+      <Route path="/pay-mobile" element={<PayMobile />} />
+      <Route path="/pay-id" element={<PayUpiId />} />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/scan-pay" element={<ScanPay />} />
+      <Route path="/notifications" element={<NotificationsPage />} />
+  </Routes>
+    </>
   );
-};
- export default App;
+}
+export default App;
