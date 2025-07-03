@@ -3,7 +3,13 @@ import { FiBell } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { auth, db } from "../firebase";
-import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
+} from "firebase/firestore";
 
 const Notifications = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,32 +19,44 @@ const Notifications = () => {
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
+
     const q = query(
       collection(db, "users", user.uid, "notifications"),
-      orderBy("timestamp", "desc"),
+      orderBy("createdAt", "desc"),
       limit(3)
     );
+
     const unsub = onSnapshot(q, (snap) => {
       setNotifications(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     });
+
     return () => unsub();
   }, [isOpen]);
 
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
+
   const goToNotifications = () => {
     handleClose();
     navigate("/notifications");
   };
+
+  const hasUnseen = notifications.some((n) => !n.seen);
 
   return (
     <div className="relative z-50">
       {/* Bell Icon */}
       <button
         onClick={handleOpen}
-        className="p-2 rounded-full text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+        className="p-2 rounded-full text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 relative"
       >
         <FiBell className="text-xl" />
+        {hasUnseen && (
+          <>
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full animate-ping" />
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full" />
+          </>
+        )}
       </button>
 
       {/* Modal */}
@@ -59,15 +77,18 @@ const Notifications = () => {
               exit={{ opacity: 0, scale: 0.9 }}
             >
               <h3 className="font-semibold text-lg mb-2 text-black dark:text-white">Notifications</h3>
-              <div className="mb-4 max-h-40 overflow-y-auto">
+
+              <div className="mb-4 max-h-40 overflow-y-auto space-y-2">
                 {notifications.length === 0 ? (
                   <p className="text-sm text-gray-500">No notifications yet.</p>
                 ) : (
                   notifications.map((note) => (
                     <div
                       key={note.id}
-                      className={`px-3 py-2 mb-1 rounded ${
-                        !note.seen ? "bg-purple-50 dark:bg-purple-950" : ""
+                      className={`px-3 py-2 rounded text-sm transition ${
+                        !note.seen
+                          ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100 font-semibold"
+                          : "bg-gray-100 dark:bg-[#2a2a2a] text-gray-800 dark:text-gray-200"
                       }`}
                     >
                       {note.message}
@@ -75,6 +96,7 @@ const Notifications = () => {
                   ))
                 )}
               </div>
+
               <button
                 onClick={goToNotifications}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-md"

@@ -7,6 +7,7 @@ import {
   runTransaction,
   collection,
   setDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 import { FiLoader } from "react-icons/fi";
@@ -52,85 +53,92 @@ const PaymentProcessing = () => {
   }, [user, userId, state, navigate]);
 
   const handleConfirm = async () => {
-    if (!user || !recipient || !state.amount || !pin) return;
-    if (pin.length !== 4) {
-      toast.error("PIN must be 4 digits");
+    if (!pin || pin.length !== 4) {
+      toast.error("Please enter a valid 4-digit PIN");
       return;
     }
+    if (pin !== storedPin) {
+      await logFailedTransaction("Incorrect PIN");
+      return navigate("/payment-result", {
+        state: {
+          status: "failed",
+          reason: "Incorrect PIN",
+          amount: state.amount,
+          recipientName: recipient?.name || "",
+          recipientId: recipient?.id,
+        },
+      });
+    }
+
     setProcessing(true);
-
-    const userRef = doc(db, "users", user.uid);
-    const recipientRef = doc(db, "users", userId);
-    const txnId = `txn_${Date.now()}`;
-    const now = new Date();
-    const amount = Number(state.amount);
-
     try {
-      await runTransaction(db, async (transaction) => {
-        const senderSnap = await transaction.get(userRef);
-        const receiverSnap = await transaction.get(recipientRef);
+      const amount = Number(state.amount);
+      const note = state.note || "Sent via ZapSplit";
+      const now = new Date();
+      // Custom transaction ID
+      const txnId = doc(collection(db, "dummy")).id;
 
-        if (!senderSnap.exists() || !receiverSnap.exists()) {
-          throw new Error("User not found");
-        }
+      await runTransaction(db, async (transaction) => {
+        const senderRef = doc(db, "users", user.uid);
+        const recipientRef = doc(db, "users", userId);
+
+        const [senderSnap, recipientSnap] = await Promise.all([
+          transaction.get(senderRef),
+          transaction.get(recipientRef),
+        ]);
 
         const sender = senderSnap.data();
-        const receiver = receiverSnap.data();
+        const recipient = recipientSnap.data();
 
-        // ✅ PIN check
-        if (sender.zupPin !== pin) {
-          throw new Error("Incorrect PIN");
-        }
-
-        // ✅ Balance check
         if (sender.wallet < amount) {
-          throw new Error("Insufficient balance");
+          throw new Error("Insufficient Balance");
         }
 
-        // ✅ Update balances
-        transaction.update(userRef, {
-          wallet: sender.wallet - amount,
-          updatedAt: now,
-        });
+        // Wallet updates
+        transaction.update(senderRef, { wallet: sender.wallet - amount });
         transaction.update(recipientRef, {
-          wallet: (receiver.wallet || 0) + amount,
-          updatedAt: now,
+          wallet: (recipient.wallet || 0) + amount,
         });
 
-        // ✅ Record sender's transaction
-        transaction.set(doc(db, `users/${user.uid}/transactions`, txnId), {
+        // Transaction refs (custom ID)
+        const senderTxnRef = doc(db, "users", user.uid, "transactions", txnId);
+        const recipientTxnRef = doc(db, "users", userId, "transactions", txnId);
+
+        // Save transactions
+        transaction.set(senderTxnRef, {
           id: txnId,
-          to: userId,
-          amount,
-          type: "sent",
-          createdAt: now,
-          note: state.note || "",
+          type: "send",
+          to: recipient.email,
+          amount: -amount,
+          note,
+          timestamp: now,
+          status: "success",
         });
 
-        // ✅ Record recipient's transaction
-        transaction.set(doc(db, `users/${userId}/transactions`, txnId), {
+        transaction.set(recipientTxnRef, {
           id: txnId,
-          from: user.uid,
+          type: "receive",
+          from: sender.email,
           amount,
-          type: "received",
-          createdAt: now,
-          note: state.note || "",
+          note,
+          timestamp: now,
+          status: "success",
         });
       });
 
-      // ✅ In-app notification for recipient
-   await setDoc(doc(db, "users", userId, "notifications", txnId), {
-  id: txnId,
-  message: `You received ₹${amount} from ${user.email}`,
-  from: user.email,
-  amount,
-  seen: false,
-  timestamp: now,
-  type: "receive",
-});
+      // Custom notification ID
+      const notifId = `notif_${txnId}`;
+      await setDoc(doc(db, "users", userId, "notifications", notifId), {
+        amount: amount,
+        from: user.email,
+        id: notifId,
+        txnId: txnId,
+        message: `₹${amount} received from ${auth.currentUser?.displayName || "a user"}`,
+        seen: false,
+        createdAt: serverTimestamp(),
+        type: "receive",
+      });
 
-
-      // ✅ Redirect to payment result page
       navigate("/payment-result", {
         state: {
           status: "success",
@@ -142,13 +150,11 @@ const PaymentProcessing = () => {
         },
       });
     } catch (err) {
-      console.error("Payment error:", err);
-      toast.error(err.message || "Payment failed");
-
+      await logFailedTransaction(err.message || "Transaction Failed");
       navigate("/payment-result", {
         state: {
           status: "failed",
-          reason: err.message || "Payment failed",
+          reason: err.message || "Transaction Failed",
           amount: state.amount,
           recipientName: recipient?.name || "",
           recipientId: recipient?.id,

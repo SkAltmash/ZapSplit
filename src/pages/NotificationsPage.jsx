@@ -22,7 +22,7 @@ const NotificationsPage = () => {
 
     const q = query(
       collection(db, "users", user.uid, "notifications"),
-      orderBy("timestamp", "desc")
+      orderBy("createdAt", "desc")
     );
 
     const unsub = onSnapshot(q, (snapshot) => {
@@ -37,23 +37,20 @@ const NotificationsPage = () => {
     return () => unsub();
   }, [user]);
 
-const markAsSeen = async (notifId) => {
-  const notifRef = doc(db, "users", user.uid, "notifications", notifId);
-  const notifSnap = await getDoc(notifRef);
-  if (!notifSnap.exists()) {
-    console.warn("Notification not found:", notifId);
-    return;
-  }
+  const markAsSeen = async (notifId) => {
+    const notifRef = doc(db, "users", user.uid, "notifications", notifId);
+    const notifSnap = await getDoc(notifRef);
+    if (!notifSnap.exists()) return;
 
-  await updateDoc(notifRef, { seen: true });
-  setNotifications((prev) =>
-    prev.map((n) =>
-      n.id === notifId ? { ...n, seen: true } : n
-    )
-  );
-};
+    await updateDoc(notifRef, { seen: true });
 
-
+    // Optimistically update UI
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.id === notifId ? { ...n, seen: true } : n
+      )
+    );
+  };
 
   const Skeleton = () => (
     <div className="space-y-3">
@@ -67,17 +64,19 @@ const markAsSeen = async (notifId) => {
   );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0d0d0d] text-gray-800 dark:text-white px-4 py-10">
+    <div className="min-h-screen bg-white mt-12 dark:bg-[#0d0d0d] text-gray-800 dark:text-white px-4 py-10">
       <div className="max-w-xl mx-auto">
         <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
-          <FaBell className="text-yellow-500" />
+          <FaBell className="text-black dark:text-white" />
           Your Notifications
         </h1>
 
         {loading ? (
           <Skeleton />
         ) : notifications.length === 0 ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">No notifications found.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            No notifications found.
+          </p>
         ) : (
           <ul className="space-y-4">
             {notifications.map((n) => (
@@ -92,16 +91,20 @@ const markAsSeen = async (notifId) => {
               >
                 <p
                   className={`text-sm ${
-                    n.seen ? "font-normal" : "font-semibold text-yellow-800 dark:text-yellow-100"
+                    n.seen
+                      ? "font-normal"
+                      : "font-semibold text-yellow-800 dark:text-yellow-100"
                   }`}
                 >
                   {n.message}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {n.timestamp
-                    ? formatDistanceToNow(n.timestamp.toDate(), { addSuffix: true })
-                    : "Just now"}
-                </p>
+                {n.createdAt && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {formatDistanceToNow(n.createdAt.toDate(), {
+                      addSuffix: true,
+                    })}
+                  </p>
+                )}
               </li>
             ))}
           </ul>
