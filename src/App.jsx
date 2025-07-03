@@ -18,6 +18,8 @@ import PayUpiId from './pages/PayUpiId';
 import ProfilePage from './pages/ProfilePage';
 import ScanPay from './pages/ScanPay';
 import NotificationsPage from './pages/NotificationsPage';
+import HelpPage from './pages/HelpPage';
+import HelpTransactionDetail from './pages/HelpTransactionDetail';
 function App() {
   return (
     <>
@@ -40,6 +42,9 @@ function App() {
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/scan-pay" element={<ScanPay />} />
       <Route path="/notifications" element={<NotificationsPage />} />
+      <Route path="/help" element={<HelpPage />} />
+      <Route path="/help/:transactionId" element={<HelpTransactionDetail />} />
+
   </Routes>
     </>
   );

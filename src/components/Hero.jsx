@@ -28,9 +28,13 @@ const Hero = () => {
         transition={{ duration: 0.6, delay: 0.6 }}
         className="mt-8 space-x-4"
       >
-        <button className="px-6 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition">
+        <Link
+          to="/signup"
+          className="inline-block px-6 py-3 bg-purple-600 text-white text-sm font-medium rounded-lg shadow hover:bg-purple-700 transition"
+        >
           Get Started
-        </button>
+        </Link>
+       
       <Link
   to="/learn-more"
   className="mt-6 inline-block px-6 py-3 bg-purple-600 text-white text-sm font-medium rounded-lg shadow hover:bg-purple-700 transition"

@@ -1,18 +1,16 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import {
-  FiCheckCircle,
-  FiXCircle,
+
   FiArrowLeft,
   FiUser,
   FiCreditCard,
   FiFileText,
 } from "react-icons/fi";
 import { motion } from "framer-motion";
-
+import { FaShieldAlt } from "react-icons/fa";
 const PaymentResult = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-
   if (!state)
     return <p className="p-4 text-center text-red-500 font-medium">Invalid payment request</p>;
 
@@ -23,23 +21,19 @@ const PaymentResult = () => {
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0d0d0d] px-4 text-gray-800 dark:text-white"
+      className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-[#0d0d0d] px-4 text-gray-800 dark:text-white"
     >
       <div className="w-full max-w-sm bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl shadow-xl border dark:border-white/10 text-center">
 
         {/* Animated Icon */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1.2 }}
-          transition={{ type: "spring", stiffness: 120 }}
-          className="mb-4"
+        <div
+          
         >
           {isSuccess ? (
-            <FiCheckCircle className="mx-auto text-green-500 text-6xl animate-bounce" />
+        <iframe className="w-full rounded-2xl mb-3" src="https://lottie.host/embed/4527779c-f16a-4d5b-8c21-8d6b57e677b0/n34irxmIbT.lottie"></iframe>
           ) : (
-            <FiXCircle className="mx-auto text-red-500 text-6xl animate-shake" />
-          )}
-        </motion.div>
+         <iframe className="w-full rounded-2xl mb-3" src="https://lottie.host/embed/50d50aaf-76a5-451d-bab8-d3796ce3e006/Dym5cQVt9I.lottie"></iframe>          )}
+        </div>
 
         {/* Status Heading */}
         <h2 className={`text-2xl font-bold mb-2 ${isSuccess ? "text-green-500" : "text-red-500"}`}>
@@ -80,13 +74,21 @@ const PaymentResult = () => {
             </span>
           </div>
           <div className="flex items-center gap-2">
+            <FiFileText />
+           <span className="font-semibold text-gray-500 dark:text-gray-400"> <strong>Tnx Id</strong>:</span>{" "}
+            <span className="text-xs text-purple-600 dark:text-purple-400 break-all">{state.txnId || "NaN"}</span>
+            {console.log(state)}
+          </div>
+          <div className="flex items-center gap-2">
             <FiArrowLeft />
             <span>
               <strong>Status:</strong>{" "}
               <span className={isSuccess ? "text-green-500" : "text-red-500"}>
                 {isSuccess ? "Success" : "Failed"}
               </span>
+             
             </span>
+            
           </div>
           {state.reason && !isSuccess && (
             <div className="flex items-center gap-2 text-red-400">
@@ -114,7 +116,12 @@ const PaymentResult = () => {
           </button>
         </div>
       </div>
-    </motion.div>
+       <div className="mb-4 text-sm text-gray-500 dark:text-gray-400 mt-4 flex items-center justify-center gap-2">
+            <FaShieldAlt className="text-green-500" />
+            <span>100% Secure • Zap Security Protected</span>
+            </div>
+     </motion.div>
+     
   );
 };
 

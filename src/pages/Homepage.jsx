@@ -17,7 +17,8 @@ function Homepage() {
 
   if (checking) {
     return (
-      <div className="h-screen flex items-center justify-center bg-white dark:bg-[#0d0d0d]">
+      <div className="h-screen flex items-center flex-col justify-center bg-white dark:bg-[#0d0d0d]">
+        <iframe src="https://lottie.host/embed/6018fd80-bc9d-4517-82fa-81cdbcdfab46/pGNR5KojX3.lottie"></iframe>
         <p className="text-gray-700 dark:text-white">Checking user...</p>
       </div>
     );

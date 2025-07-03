@@ -3,10 +3,16 @@ import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { FiArrowLeft } from "react-icons/fi";
+import {FaShieldAlt} from "react-icons/fa";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 
 const TransactionDetails = () => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth"
+    });
   const { id } = useParams();
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -57,7 +63,15 @@ const TransactionDetails = () => {
           </button>
           <h2 className="text-lg font-bold">Transaction Details</h2>
         </div>
-
+           {/* Animated Icon */}
+        <div
+        
+        >
+          {txn.status=="success"? (
+        <iframe className="w-full rounded-2xl mb-3" src="https://lottie.host/embed/4527779c-f16a-4d5b-8c21-8d6b57e677b0/n34irxmIbT.lottie"></iframe>
+          ) : (
+         <iframe className="w-full rounded-2xl mb-3" src="https://lottie.host/embed/50d50aaf-76a5-451d-bab8-d3796ce3e006/Dym5cQVt9I.lottie"></iframe>          )}
+        </div>
         {/* Status + Amount Highlight */}
         <div className="text-center mb-6">
           <h3
@@ -105,7 +119,27 @@ const TransactionDetails = () => {
             <span className="text-xs text-purple-600 dark:text-purple-400 break-all">{txn.id}</span>
           </p>
         </div>
+        <div className="mt-6 flex gap-5">
+          <button className="bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-purple-700 transition duration-200 "
+            onClick={() => navigate(`/help/${txn.id}`)}
+          >
+            Need Help?
+          </button>
+          {state.status === "success" && state.type === "send" && state.amount <-1 &&(
+          <button
+           className="bg-gray-200 dark:bg-[#2a2a2a] text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-[#3a3a3a] transition duration-200"
+          onClick={() => navigate("/split")}
+           >
+           Split it
+         </button>
+         )}
+          </div>
       </motion.div>
+     <div className="mb-4 text-sm text-gray-500 dark:text-gray-400 mt-4 flex items-center justify-center gap-2">
+      <FaShieldAlt className="text-green-500" />
+      <span>100% Secure • Zap Security Protected</span>
+      </div>
+      
     </div>
   );
 };

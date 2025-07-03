@@ -126,7 +126,6 @@ const PaymentProcessing = () => {
         });
       });
 
-      // Custom notification ID
       const notifId = `notif_${txnId}`;
       await setDoc(doc(db, "users", userId, "notifications", notifId), {
         amount: amount,
