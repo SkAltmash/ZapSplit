@@ -88,7 +88,7 @@ const HelpTransactionDetail = () => {
   }, [transactionId, navigate]);
 
   return (
-    <div className="w-screen bg-[#eee] dark:bg-[#1b1b2c]">
+    <div className="w-screen bg-[#eee] dark:bg-[#1b1b1c]">
        <div className=" h-[calc(100vh-3rem)] mt-12 bg-white dark:bg-[#0d0d0d] text-gray-800 dark:text-white flex flex-col max-w-[400px] m-auto">
       <header className="p-4 bg-purple-600 text-white font-semibold text-lg flex justify-between items-center">
         Help Center

@@ -12,8 +12,9 @@ function PublicHomepage() {
     <Hero />
     <AboutSection />
     <FeaturesSection />
-    <FAQSection />
     <TestimonialsSection />
+        <FAQSection />
+
     <Footer />
     </>
   

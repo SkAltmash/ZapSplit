@@ -20,6 +20,9 @@ import ScanPay from './pages/ScanPay';
 import NotificationsPage from './pages/NotificationsPage';
 import HelpPage from './pages/HelpPage';
 import HelpTransactionDetail from './pages/HelpTransactionDetail';
+import SplitTransaction from './pages/SplitTransaction';
+import MySplits from './pages/MySplits';
+import PaySplit from './pages/PaySplit';
 function App() {
   return (
     <>
@@ -44,6 +47,12 @@ function App() {
       <Route path="/notifications" element={<NotificationsPage />} />
       <Route path="/help" element={<HelpPage />} />
       <Route path="/help/:transactionId" element={<HelpTransactionDetail />} />
+      <Route path="/split/:txnId" element={<SplitTransaction />} />
+      <Route path="/my-splits" element={<MySplits />} />
+      <Route path="/pay-split/:splitId" element={<PaySplit />} />
+      
+      {/* Catch-all route for 404 */}
+      <Route path="*" element={<div className="text-center mt-10 text-gray-600 dark:text-gray-300">Page not found</div>} />
 
   </Routes>
     </>

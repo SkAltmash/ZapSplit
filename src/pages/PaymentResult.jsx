@@ -77,7 +77,6 @@ const PaymentResult = () => {
             <FiFileText />
            <span className="font-semibold text-gray-500 dark:text-gray-400"> <strong>Tnx Id</strong>:</span>{" "}
             <span className="text-xs text-purple-600 dark:text-purple-400 break-all">{state.txnId || "NaN"}</span>
-            {console.log(state)}
           </div>
           <div className="flex items-center gap-2">
             <FiArrowLeft />

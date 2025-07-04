@@ -125,14 +125,23 @@ const TransactionDetails = () => {
           >
             Need Help?
           </button>
-          {state.status === "success" && state.type === "send" && state.amount <-1 &&(
+          {state.status === "success" && state.type === "send" && state.amount <-1 && !state.split && (
           <button
            className="bg-gray-200 dark:bg-[#2a2a2a] text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-[#3a3a3a] transition duration-200"
-          onClick={() => navigate("/split")}
+          onClick={() => navigate(`/split/${txn.id}`)}
            >
            Split it
          </button>
-         )}
+        )}
+        { state.split==true && (
+          <button
+           className="bg-gray-200 dark:bg-[#2a2a2a] text-gray-800 dark:text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-[#3a3a3a] transition duration-200"
+          onClick={() => navigate(`/my-splits`)}
+           >
+           View Split
+         </button>
+        )}
+
           </div>
       </motion.div>
      <div className="mb-4 text-sm text-gray-500 dark:text-gray-400 mt-4 flex items-center justify-center gap-2">
