@@ -95,7 +95,8 @@ const SplitTransaction = () => {
 
   const handleSplit = async () => {
     const totalParticipants = selected.length + 1;
-    const perPerson = Math.abs(transaction.amount) / totalParticipants;
+    const perPersonRaw = Math.abs(transaction.amount) / totalParticipants;
+    const perPerson = Number(perPersonRaw.toFixed(2));
 
     if (!transaction || selected.length === 0) {
       toast.error("Please select participants");
@@ -155,7 +156,8 @@ const SplitTransaction = () => {
   }
 
   const totalParticipants = selected.length + 1;
-  const perPerson = (Math.abs(transaction.amount) / totalParticipants).toFixed(2);
+  const perPersonRaw = Math.abs(transaction.amount) / totalParticipants;
+  const perPerson = Number(perPersonRaw.toFixed(2));
 
   const filteredUsers = users.filter((u) =>
     u.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -166,89 +168,88 @@ const SplitTransaction = () => {
     selected.length === 0 || splitting || perPerson < 1;
 
   return (
-   <div className="w-screen bg-white dark:bg-[#1b1b1b]">
-  <div className="max-w-md mx-auto p-4 mt-12 dark:bg-black min-h-[calc(100vh-3rem)]  bg-white rounded-2xl shadow-lg flex flex-col">
-    
-    <h2 className="text-2xl font-bold mb-2 text-center dark:text-white">
-      Split ₹{Math.abs(transaction.amount)} for "{transaction.note}"
-    </h2>
+    <div className="w-screen bg-white dark:bg-[#1b1b1b]">
+      <div className="max-w-md mx-auto p-4 mt-12 dark:bg-black min-h-[calc(100vh-3rem)] bg-white rounded-2xl shadow-lg flex flex-col">
+        
+        <h2 className="text-2xl font-bold mb-2 text-center dark:text-white">
+          Split ₹{Math.abs(transaction.amount)} for "{transaction.note}"
+        </h2>
 
-    <p className="text-sm mb-4 text-center dark:text-white">
-      Select up to 4 participants to split with:
-    </p>
+        <p className="text-sm mb-4 text-center dark:text-white">
+          Select up to 4 participants to split with:
+        </p>
 
-    <input
-      type="text"
-      placeholder="Search participants..."
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-      className="w-full px-3 py-2 mb-3 border rounded focus:outline-none dark:bg-gray-800 dark:text-white dark:border-gray-700"
-    />
+        <input
+          type="text"
+          placeholder="Search participants..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full px-3 py-2 mb-3 border rounded focus:outline-none dark:bg-gray-800 dark:text-white dark:border-gray-700"
+        />
 
-    <div className="flex-1 overflow-y-auto space-y-2 pr-1">
-      {loading
-        ? Array.from({ length: 5 }).map((_, idx) => (
-            <div
-              key={idx}
-              className="flex items-center gap-3 px-3 py-2 rounded border shadow-sm animate-pulse bg-gray-100 dark:bg-gray-800"
-            >
-              <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700"></div>
-              <div className="flex-1 h-4 bg-gray-300 dark:bg-gray-700 rounded"></div>
-            </div>
-          ))
-        : filteredUsers.map((u) => (
-            <label
-              key={u.id}
-              className={`flex items-center gap-3 px-3 py-2 rounded border shadow-sm cursor-pointer transition
-              hover:bg-gray-50 dark:hover:bg-gray-800
+        <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+          {loading
+            ? Array.from({ length: 5 }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-3 px-3 py-2 rounded border shadow-sm animate-pulse bg-gray-100 dark:bg-gray-800"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                  <div className="flex-1 h-4 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                </div>
+              ))
+            : filteredUsers.map((u) => (
+                <label
+                  key={u.id}
+                  className={`flex items-center gap-3 px-3 py-2 rounded border shadow-sm cursor-pointer transition
+                  hover:bg-gray-50 dark:hover:bg-gray-800
+                  ${
+                    selected.some((s) => s.uid === u.id)
+                      ? "bg-green-50 border-green-400 dark:bg-green-900"
+                      : "dark:bg-gray-900 dark:border-gray-700"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected.some((s) => s.uid === u.id)}
+                    onChange={() => handleSelect(u)}
+                  />
+                  <img
+                    src={u.photoURL}
+                    alt={u.name}
+                    className="w-8 h-8 rounded-full border"
+                  />
+                  <div className="flex flex-col">
+                    <span className="font-medium dark:text-white">{u.name}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {u.email}
+                    </span>
+                  </div>
+                </label>
+              ))}
+        </div>
+
+        <div className="mt-4">
+          <button
+            onClick={handleSplit}
+            disabled={disableSplit}
+            className={`px-4 py-2 rounded w-full text-white text-lg transition
               ${
-                selected.some((s) => s.uid === u.id)
-                  ? "bg-green-50 border-green-400 dark:bg-green-900"
-                  : "dark:bg-gray-900 dark:border-gray-700"
+                disableSplit
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
               }`}
-            >
-              <input
-                type="checkbox"
-                checked={selected.some((s) => s.uid === u.id)}
-                onChange={() => handleSelect(u)}
-              />
-              <img
-                src={u.photoURL}
-                alt={u.name}
-                className="w-8 h-8 rounded-full border"
-              />
-              <div className="flex flex-col">
-                <span className="font-medium dark:text-white">{u.name}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {u.email}
-                </span>
-              </div>
-            </label>
-          ))}
+          >
+            {splitting
+              ? "Splitting…"
+              : perPerson < 1
+              ? "Amount too small to split"
+              : `Split ₹${perPerson.toFixed(2)} each (${totalParticipants} people)`}
+          </button>
+        </div>
+
+      </div>
     </div>
-
-    <div className="mt-4">
-      <button
-        onClick={handleSplit}
-        disabled={disableSplit}
-        className={`px-4 py-2 rounded w-full text-white text-lg transition
-          ${
-            disableSplit
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-green-600 hover:bg-green-700"
-          }`}
-      >
-        {splitting
-          ? "Splitting…"
-          : perPerson < 1
-          ? "Amount too small to split"
-          : `Split ₹${perPerson} each (${totalParticipants} people)`}
-      </button>
-    </div>
-
-  </div>
-</div>
-
   );
 };
 

@@ -5,6 +5,8 @@ import { auth } from "../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { Link } from "react-router-dom";
 import Notifications from "./Notifications";
+import SplitButton from "./SplitButton";
+
 const Navbar = () => {
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("theme") === "dark"
@@ -56,23 +58,28 @@ const Navbar = () => {
               </>
             ) : (
               <>
-              <Link to="/profile" className="flex items-center gap-2">
-                <img
-                  src={user.photoURL || "https://i.pravatar.cc/100"}
-                  alt="avatar"
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-              </Link>
+                <Link to="/profile" className="flex items-center gap-2">
+                  <img
+                    src={user.photoURL || "https://i.pravatar.cc/100"}
+                    alt="avatar"
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                </Link>
+
+                <div className="flex items-center gap-2 ml-2">
+                  <Notifications />
+                  <SplitButton />
+                </div>
+
                 <button
                   onClick={handleLogout}
                   className="text-sm font-medium text-gray-700 dark:text-gray-300 px-4 py-1.5 rounded-lg border border-gray-300 dark:border-white/20 hover:border-red-500 dark:hover:border-red-400 transition"
                 >
                   Logout
                 </button>
-                                                       <Notifications />
-
               </>
             )}
+
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition"
@@ -86,14 +93,12 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Icon */}
-          
           <button
             className="md:hidden text-2xl text-gray-700 dark:text-gray-300"
             onClick={toggleDrawer}
           >
             {drawerOpen ? <FiX /> : <FiMenu />}
           </button>
-           
         </div>
       </nav>
 
@@ -143,13 +148,25 @@ const Navbar = () => {
                         {user.displayName || "User"}
                       </p>
                       <p className="text-xs text-gray-500">{user.email}</p>
-                      
-
                     </div>
                   </div>
-                                                                   <Notifications />
+
+                  <div className="flex  gap-3 mt-2 justify-center align-middle">
+                   
+                    <div>
+                    <button
+                    onClick={toggleDarkMode}
+                     className="flex items-center gap-2 mt-2 text-2xl text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400"
+                     >
+                    {darkMode ? <FiSun /> : <FiMoon />}
+                    </button>
+                    </div>
+                     <Notifications onClick={toggleDrawer} />
+                    <SplitButton onClick={toggleDrawer} />
+                  </div>
 
                   <div className="border-t border-gray-200 dark:border-white/10 my-4" />
+
                   <Link
                     to="/profile"
                     className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
@@ -163,15 +180,17 @@ const Navbar = () => {
                     className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
                     onClick={toggleDrawer}
                   >
-                  Scan & Pay
+                    Scan & Pay
                   </Link>
-                  <Link 
-                  to ="/help"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
-                  onClick={toggleDrawer}
+
+                  <Link
+                    to="/help"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
+                    onClick={toggleDrawer}
                   >
                     Help
                   </Link>
+
                   <button
                     onClick={handleLogout}
                     className="text-sm font-medium text-red-600 border border-red-300 dark:border-red-400 px-4 py-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-800/20 transition"
@@ -181,13 +200,7 @@ const Navbar = () => {
                 </>
               )}
 
-              <button
-                onClick={toggleDarkMode}
-                className="flex items-center gap-2 mt-4 text-sm text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400"
-              >
-                {darkMode ? <FiSun /> : <FiMoon />}
-                {darkMode ? "Light Mode" : "Dark Mode"}
-              </button>
+            
             </motion.div>
           </>
         )}

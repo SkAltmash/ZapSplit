@@ -118,6 +118,14 @@ const TransactionDetails = () => {
             <span className="font-semibold text-gray-500 dark:text-gray-400">Transaction ID:</span>{" "}
             <span className="text-xs text-purple-600 dark:text-purple-400 break-all">{txn.id}</span>
           </p>
+           {txn.split && (
+          <p>
+            <span className="font-semibold text-gray-500 dark:text-gray-400">Split:</span>{" "}
+            <span className="text-xs text-blue-600 dark:text-blue-400">
+                Multiple participants
+            </span> 
+            </p>
+          )}  
         </div>
         <div className="mt-6 flex gap-5">
           <button className="bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-purple-700 transition duration-200 "

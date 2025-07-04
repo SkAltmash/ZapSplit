@@ -21,7 +21,7 @@ const PaymentResult = () => {
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-[#0d0d0d] px-4 text-gray-800 dark:text-white"
+      className="min-h-screen flex flex-col  mt-12 items-center justify-center bg-white dark:bg-[#0d0d0d] px-4 text-gray-800 dark:text-white"
     >
       <div className="w-full max-w-sm bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl shadow-xl border dark:border-white/10 text-center">
 

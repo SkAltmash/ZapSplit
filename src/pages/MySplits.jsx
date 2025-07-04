@@ -7,6 +7,7 @@ const MySplits = () => {
   const [splits, setSplits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [filter, setFilter] = useState("all");
 
   const navigate = useNavigate();
 
@@ -29,6 +30,7 @@ const MySplits = () => {
         id: doc.id,
         ...doc.data(),
       }));
+
       const mySplits = allSplits.filter((split) => {
         const isInitiator = split.initiator?.uid === user.uid;
         const isParticipant = split.participants?.some(
@@ -44,12 +46,44 @@ const MySplits = () => {
     return () => unsub();
   }, [user]);
 
+  const getMyPaidStatus = (split) => {
+    const me =
+      split.participants.find((p) => p.uid === user.uid) || {};
+    return me.paid || split.initiator.uid === user.uid;
+  };
+
+  const filteredSplits = splits
+    .map((split) => ({
+      ...split,
+      mePaid: getMyPaidStatus(split),
+    }))
+    .filter((split) => {
+      if (filter === "paid") return split.mePaid;
+      if (filter === "pending") return !split.mePaid;
+      return true;
+    })
+    .sort((a, b) => a.mePaid - b.mePaid); // pending first
+
   return (
     <div className="max-w-full mx-auto p-4 mt-12 dark:bg-black min-h-screen">
       <div className="space-y-4 max-w-[500px] mt-5 bg-white dark:bg-[#0d0d0d] p-4 rounded-2xl shadow-lg m-auto">
-        <h2 className="text-3xl font-bold mb-4 text-center dark:text-white">
-          My Splits
+       <div className="mb-4 flex gap-5">
+         <h2 className="text-3xl font-bold mb-4 text-center dark:text-white">
+           Splits
         </h2>
+
+        <div className="flex justify-center mb-4">
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="px-3 py-1.5 rounded-md border text-sm dark:bg-[#1a1a1a] dark:text-white"
+          >
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+          </select>
+        </div>
+       </div>
 
         {loading &&
           Array.from({ length: 3 }).map((_, idx) => (
@@ -67,24 +101,23 @@ const MySplits = () => {
             </div>
           ))}
 
-        {!loading && splits.length === 0 && (
+        {!loading && filteredSplits.length === 0 && (
           <p className="text-gray-500 dark:text-gray-300 text-center">
-            You have no splits yet.
+            No splits found.
           </p>
         )}
 
         {!loading &&
-          splits.map((split) => {
+          filteredSplits.map((split) => {
             const me =
               split.participants.find((p) => p.uid === user.uid) || {};
-            const paid = me.paid || split.initiator.uid === user.uid;
+            const paid = split.mePaid;
 
             return (
               <div
                 key={split.id}
                 className="border rounded-xl p-4 flex flex-col gap-3 bg-white dark:bg-[#1b1b1b] shadow hover:shadow-lg transition duration-200 cursor-pointer"
               >
-                {/* Header */}
                 <div className="flex justify-between items-center">
                   <div>
                     <div className="font-semibold text-lg dark:text-white">
@@ -119,7 +152,6 @@ const MySplits = () => {
                   </div>
                 </div>
 
-                {/* Amount */}
                 <div className="text-sm dark:text-white">
                   <span className="font-medium">Amount: </span>
                   <span className="font-bold">₹{split.amount}</span>
@@ -128,7 +160,6 @@ const MySplits = () => {
                   </span>
                 </div>
 
-                {/* Participants */}
                 <div className="text-xs text-gray-400">
                   <span className="font-medium dark:text-gray-300">
                     Participants:
@@ -162,11 +193,10 @@ const MySplits = () => {
                               })`}
                         </span>
 
-                        {/* Pay Now button */}
                         {p.uid === user.uid && !p.paid && (
                           <button
                             onClick={(e) => {
-                              e.stopPropagation(); // prevent navigating
+                              e.stopPropagation();
                               navigate(`/pay-split/${split.id}`);
                             }}
                             className="ml-2 text-xs bg-blue-600 text-white px-2 py-0.5 rounded hover:bg-blue-700 transition"

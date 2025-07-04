@@ -48,13 +48,13 @@ const Notifications = () => {
       {/* Bell Icon */}
       <button
         onClick={handleOpen}
-        className="p-2 rounded-full text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 relative"
+        className="p-2 rounded-full text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 relative"
       >
-        <FiBell className="text-xl" />
+        <FiBell className="text-2xl" />
         {hasUnseen && (
           <>
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full animate-ping" />
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full" />
+            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-ping" />
+            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full" />
           </>
         )}
       </button>
@@ -64,45 +64,52 @@ const Notifications = () => {
         {isOpen && (
           <>
             <motion.div
-              className="fixed inset-0 bg-black/40 z-40"
+              className="fixed inset-0 bg-black/30 z-40"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={handleClose}
             />
             <motion.div
-              className="fixed top-20 right-6 bg-white dark:bg-[#1a1a1a] p-4 rounded-xl shadow-lg z-50 w-72"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
+              className="fixed top-16 right-4 bg-white dark:bg-[#1a1a1a] rounded-xl shadow-2xl z-50 w-80"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
             >
-              <h3 className="font-semibold text-lg mb-2 text-black dark:text-white">Notifications</h3>
+              <div className="p-4">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                  Notifications
+                </h3>
 
-              <div className="mb-4 max-h-40 overflow-y-auto space-y-2">
-                {notifications.length === 0 ? (
-                  <p className="text-sm text-gray-500">No notifications yet.</p>
-                ) : (
-                  notifications.map((note) => (
-                    <div
-                      key={note.id}
-                      className={`px-3 py-2 rounded text-sm transition ${
-                        !note.seen
-                          ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100 font-semibold"
-                          : "bg-gray-100 dark:bg-[#2a2a2a] text-gray-800 dark:text-gray-200"
-                      }`}
-                    >
-                      {note.message}
-                    </div>
-                  ))
-                )}
+                <div className="my-3 max-h-48 overflow-y-auto space-y-2">
+                  {notifications.length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      You have no notifications.
+                    </p>
+                  ) : (
+                    notifications.map((note) => (
+                      <div
+                        key={note.id}
+                        className={`px-3 py-2 rounded-lg text-sm leading-snug transition
+                          ${
+                            !note.seen
+                              ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 font-medium"
+                              : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                          }`}
+                      >
+                        {note.message}
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <button
+                  onClick={goToNotifications}
+                  className="mt-3 w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition"
+                >
+                  View All
+                </button>
               </div>
-
-              <button
-                onClick={goToNotifications}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-md"
-              >
-                Go to Notifications
-              </button>
             </motion.div>
           </>
         )}

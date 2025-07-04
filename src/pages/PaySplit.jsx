@@ -181,7 +181,7 @@ const PaySplit = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-[#0d0d0d] px-4">
       <div className="w-full max-w-sm p-6 bg-white dark:bg-[#1a1a1a] border rounded-xl shadow-lg text-center">
-        <h2 className="text-xl font-bold mb-2">Enter your ZUP PIN</h2>
+        <h2 className="text-xl font-bold mb-2 dark:text-white">Enter your ZUP PIN</h2>
         <p className="text-sm text-gray-500 mb-6">
           Paying ₹{split.perPerson} towards <br /> "<span className="font-medium">{split.note}</span>"
         </p>
