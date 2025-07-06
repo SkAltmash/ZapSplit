@@ -7,13 +7,12 @@ import { FiArrowLeft } from "react-icons/fi";
 
 const PayUser = () => {
   const { userId } = useParams();
+  const {sendingAmount} = useParams()
   const navigate = useNavigate();
 
   const [recipient, setRecipient] = useState(null);
-  const [amount, setAmount] = useState("");
-  const [note, setNote] = useState("");
+const [amount, setAmount] = useState(sendingAmount || "");  const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
-
   useEffect(() => {
     const unsub = auth.onAuthStateChanged(async (u) => {
       if (u) {
@@ -78,13 +77,13 @@ const PayUser = () => {
 
         {/* Input Fields */}
         <div className="space-y-4">
-          <input
-            type="number"
-            placeholder="Enter amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border dark:bg-[#2a2a2a] dark:text-white text-xl text-center"
-          />
+       <input
+  type="number"
+  placeholder="Enter amount"
+  value={amount}
+  onChange={(e) => setAmount(e.target.value)}
+  className="w-full px-4 py-3 rounded-lg border dark:bg-[#2a2a2a] dark:text-white text-xl text-center"
+/>
 
           <input
             type="text"

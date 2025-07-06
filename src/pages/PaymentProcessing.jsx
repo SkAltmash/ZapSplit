@@ -7,6 +7,7 @@ import {
   runTransaction,
   collection,
   setDoc,
+  addDoc,
   serverTimestamp,
 } from "firebase/firestore";
 import { toast } from "react-hot-toast";
@@ -14,7 +15,7 @@ import { FiLoader } from "react-icons/fi";
 
 const PaymentProcessing = () => {
   const { userId } = useParams();
-  const { state } = useLocation(); // amount, note
+  const { state } = useLocation(); // contains: amount, note
   const navigate = useNavigate();
 
   const [recipient, setRecipient] = useState(null);
@@ -71,11 +72,12 @@ const PaymentProcessing = () => {
     }
 
     setProcessing(true);
+
     try {
       const amount = Number(state.amount);
       const note = state.note || "Sent via ZapSplit";
-      const now = new Date();
-      // Custom transaction ID
+
+      // generate transaction ID
       const txnId = doc(collection(db, "dummy")).id;
 
       await runTransaction(db, async (transaction) => {
@@ -94,24 +96,21 @@ const PaymentProcessing = () => {
           throw new Error("Insufficient Balance");
         }
 
-        // Wallet updates
         transaction.update(senderRef, { wallet: sender.wallet - amount });
-        transaction.update(recipientRef, {
-          wallet: (recipient.wallet || 0) + amount,
-        });
+        transaction.update(recipientRef, { wallet: (recipient.wallet || 0) + amount });
 
-        // Transaction refs (custom ID)
         const senderTxnRef = doc(db, "users", user.uid, "transactions", txnId);
         const recipientTxnRef = doc(db, "users", userId, "transactions", txnId);
 
-        // Save transactions
+        const timestamp = serverTimestamp();
+
         transaction.set(senderTxnRef, {
           id: txnId,
           type: "send",
           to: recipient.email,
           amount: -amount,
           note,
-          timestamp: now,
+          timestamp,
           status: "success",
         });
 
@@ -121,22 +120,56 @@ const PaymentProcessing = () => {
           from: sender.email,
           amount,
           note,
-          timestamp: now,
+          timestamp,
           status: "success",
         });
       });
 
+      // 🔔 Notification
       const notifId = `notif_${txnId}`;
       await setDoc(doc(db, "users", userId, "notifications", notifId), {
-        amount: amount,
+        amount,
         from: user.email,
         id: notifId,
-        txnId: txnId,
+        txnId,
         message: `₹${amount} received from ${auth.currentUser?.displayName || "a user"}`,
         seen: false,
         createdAt: serverTimestamp(),
         type: "receive",
       });
+
+      // 📝 Add/update conversation
+      const conversationId =
+        user.uid < userId ? `${user.uid}_${userId}` : `${userId}_${user.uid}`;
+
+      const message = {
+        text: `₹${amount} sent`,
+        from: user.uid,
+        to: userId,
+        amount,
+        note,
+        timestamp: serverTimestamp(),
+        txnId,
+        type: "payment",
+        status: "success",
+      };
+
+      // update parent doc
+      await setDoc(
+        doc(db, "conversations", conversationId),
+        {
+          users: [user.uid, userId],
+          lastMessage: message,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      // add message to messages subcollection
+      await addDoc(
+        collection(db, "conversations", conversationId, "messages"),
+        message
+      );
 
       navigate("/payment-result", {
         state: {
@@ -149,6 +182,7 @@ const PaymentProcessing = () => {
         },
       });
     } catch (err) {
+      console.error(err);
       await logFailedTransaction(err.message || "Transaction Failed");
       navigate("/payment-result", {
         state: {
@@ -165,29 +199,59 @@ const PaymentProcessing = () => {
   };
 
   const logFailedTransaction = async (reason) => {
-    const now = new Date();
-    const senderRef = doc(db, "users", user.uid);
-    const txnRef = doc(collection(senderRef, "transactions"));
+    const txnRef = doc(collection(db, "users", user.uid, "transactions"));
+    const conversationId =
+      user.uid < userId ? `${user.uid}_${userId}` : `${userId}_${user.uid}`;
 
+    const failedTxn = {
+      id: txnRef.id,
+      type: "send",
+      to: recipient?.email || "",
+      amount: -state.amount,
+      note: `${state.note || "Payment attempt"} • Failed: ${reason}`,
+      timestamp: serverTimestamp(),
+      status: "failed",
+    };
+
+    // save in transactions
+    await setDoc(txnRef, failedTxn, { merge: true });
+
+    const failedMsg = {
+      text: `₹${state.amount} failed`,
+      from: user.uid,
+      to: userId,
+      amount: state.amount,
+      note: reason,
+      timestamp: serverTimestamp(),
+      txnId: txnRef.id,
+      type: "payment",
+      status: "failed",
+    };
+
+    // save/update conversation doc
     await setDoc(
-      txnRef,
+      doc(db, "conversations", conversationId),
       {
-        id: txnRef.id,
-        type: "send",
-        to: recipient?.email || "",
-        amount: -state.amount,
-        note: `${state.note || "Payment attempt"} • Failed: ${reason}`,
-        timestamp: now,
-        status: "failed",
+        users: [user.uid, userId],
+        lastMessage: failedMsg,
+        updatedAt: serverTimestamp(),
       },
       { merge: true }
     );
+
+    // save in messages
+    await addDoc(
+      collection(db, "conversations", conversationId, "messages"),
+      failedMsg
+    );
   };
+
+  if (!recipient) return null;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-[#0d0d0d] px-4">
       <div className="w-full max-w-sm p-6 bg-white dark:bg-[#1a1a1a] border rounded-xl shadow-lg text-center">
-        <h2 className="text-xl font-bold mb-2">Enter your ZUP PIN</h2>
+        <h2 className="text-xl font-bold mb-2 dark:text-white">Enter your ZUP PIN</h2>
         <p className="text-sm text-gray-500 mb-6">
           Sending ₹{state.amount} to {recipient?.name}
         </p>

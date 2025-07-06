@@ -23,6 +23,7 @@ import HelpTransactionDetail from './pages/HelpTransactionDetail';
 import SplitTransaction from './pages/SplitTransaction';
 import MySplits from './pages/MySplits';
 import PaySplit from './pages/PaySplit';
+import AddMoney from './pages/AddMoney';
 function App() {
   return (
     <>
@@ -36,7 +37,7 @@ function App() {
       <Route path='/success' element={<Success />} />
       <Route path="/send" element={<Send />} />
       <Route path="/send/:userId" element={<SendToUser />} />
-      <Route path="/pay/:userId" element={<PayUser />} />
+      <Route path="/pay/:userId/:sendingAmount" element={<PayUser />} />
      <Route path="/pay/:userId/processing" element={<PaymentProcessing />} />
        <Route path="/payment-result" element={<PaymentResult />} />
       <Route path="/transaction/:id" element={<TransactionDetails />} />
@@ -50,7 +51,7 @@ function App() {
       <Route path="/split/:txnId" element={<SplitTransaction />} />
       <Route path="/my-splits" element={<MySplits />} />
       <Route path="/pay-split/:splitId" element={<PaySplit />} />
-      
+      <Route path="/add-money" element={<AddMoney />} />
       {/* Catch-all route for 404 */}
       <Route path="*" element={<div className="text-center mt-10 text-gray-600 dark:text-gray-300">Page not found</div>} />
 

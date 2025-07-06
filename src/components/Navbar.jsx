@@ -168,17 +168,17 @@ const Navbar = () => {
                   <div className="border-t border-gray-200 dark:border-white/10 my-4" />
 
                   <Link
-                    to="/profile"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
                     onClick={toggleDrawer}
+                     to="/profile"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
                   >
                     Profile
                   </Link>
 
                   <Link
-                    to="/scan-pay"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
-                    onClick={toggleDrawer}
+                  onClick={toggleDrawer}
+                  to="/scan-pay"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
                   >
                     Scan & Pay
                   </Link>

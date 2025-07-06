@@ -11,7 +11,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 
-const Notifications = () => {
+const Notifications = ({ onClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
@@ -33,7 +33,11 @@ const Notifications = () => {
     return () => unsub();
   }, [isOpen]);
 
-  const handleOpen = () => setIsOpen(true);
+  const handleOpen = () => {
+    setIsOpen(true);
+    if (onClick) onClick(); // close drawer if in mobile
+  };
+
   const handleClose = () => setIsOpen(false);
 
   const goToNotifications = () => {

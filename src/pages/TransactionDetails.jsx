@@ -67,10 +67,25 @@ const TransactionDetails = () => {
         <div
         
         >
-          {txn.status=="success"? (
-        <iframe className="w-full rounded-2xl mb-3" src="https://lottie.host/embed/4527779c-f16a-4d5b-8c21-8d6b57e677b0/n34irxmIbT.lottie"></iframe>
-          ) : (
-         <iframe className="w-full rounded-2xl mb-3" src="https://lottie.host/embed/50d50aaf-76a5-451d-bab8-d3796ce3e006/Dym5cQVt9I.lottie"></iframe>          )}
+      <div>
+  {txn.type === "add" ? (
+    <iframe
+      className="w-full rounded-2xl mb-3"
+      src="https://lottie.host/embed/32d214e8-ec1b-4da2-924e-8705344e13a8/SHbtp3KCfK.lottie"
+    ></iframe>
+  ) : txn.status === "success" ? (
+    <iframe
+      className="w-full rounded-2xl mb-3"
+      src="https://lottie.host/embed/4527779c-f16a-4d5b-8c21-8d6b57e677b0/n34irxmIbT.lottie"
+    ></iframe>
+  ) : (
+    <iframe
+      className="w-full rounded-2xl mb-3"
+      src="https://lottie.host/embed/50d50aaf-76a5-451d-bab8-d3796ce3e006/Dym5cQVt9I.lottie"
+    ></iframe>
+  )}
+</div>
+          
         </div>
         {/* Status + Amount Highlight */}
         <div className="text-center mb-6">
