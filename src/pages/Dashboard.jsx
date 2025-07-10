@@ -61,7 +61,7 @@ const Dashboard = () => {
           transition={{ duration: 0.4 }}
           className="text-3xl font-bold mb-6"
         >
-          <p>Hello {user.displayName}</p>
+          <p>Hello <span className="text-purple-600">{user.displayName}</span></p>
         </motion.h1>
 
         <motion.div

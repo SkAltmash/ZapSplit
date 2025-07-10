@@ -13,7 +13,8 @@ import {
 import { FiArrowLeft, FiSearch } from "react-icons/fi";
 import { formatDistanceToNow } from "date-fns";
 import ChatInput from "../components/ChatInput";
-
+import { FiCheckCircle, FiXCircle } from "react-icons/fi";
+import SkeletonLoader from "../components/SkeletonLoader";
 const SendToUser = () => {
   const { userId: routeUserId } = useParams();
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const SendToUser = () => {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [expandedMsgs, setExpandedMsgs] = useState({});
+    const [loading, setLoading] = useState(true);
 
   const scrollRef = useRef(null);
 
@@ -48,41 +50,45 @@ const SendToUser = () => {
     return () => unsubAuth();
   }, [navigate, routeUserId]);
 
-  useEffect(() => {
-    if (!currentUser || !routeUserId) return;
+useEffect(() => {
+  if (!currentUser || !routeUserId) return;
 
-    const fetchConversation = async () => {
-      const snap = await getDoc(doc(db, "users", routeUserId));
-      if (!snap.exists()) {
-        navigate("/send");
-        return;
-      }
+  setLoading(true); // start loading
 
-      const rec = { id: snap.id, ...snap.data() };
-      setRecipient(rec);
+  const fetchConversation = async () => {
+    const snap = await getDoc(doc(db, "users", routeUserId));
+    if (!snap.exists()) {
+      navigate("/send");
+      return;
+    }
 
-      const convoId =
-        currentUser.uid < rec.id
-          ? `${currentUser.uid}_${rec.id}`
-          : `${rec.id}_${currentUser.uid}`;
-      setConversationId(convoId);
+    const rec = { id: snap.id, ...snap.data() };
+    setRecipient(rec);
 
-      const msgRef = collection(db, "conversations", convoId, "messages");
-      const q = query(msgRef, orderBy("timestamp", "asc"));
+    const convoId =
+      currentUser.uid < rec.id
+        ? `${currentUser.uid}_${rec.id}`
+        : `${rec.id}_${currentUser.uid}`;
+    setConversationId(convoId);
 
-      const unsubMsgs = onSnapshot(q, (snapshot) => {
-        const msgs = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setMessages(msgs);
-      });
+    const msgRef = collection(db, "conversations", convoId, "messages");
+    const q = query(msgRef, orderBy("timestamp", "asc"));
 
-      return () => unsubMsgs();
-    };
+    const unsubMsgs = onSnapshot(q, (snapshot) => {
+      const msgs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMessages(msgs);
+      setLoading(false); // stop loading when messages arrive
+    });
 
-    fetchConversation();
-  }, [routeUserId, currentUser, navigate]);
+    return () => unsubMsgs();
+  };
+
+  fetchConversation();
+}, [routeUserId, currentUser, navigate]);
+
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -106,7 +112,7 @@ const SendToUser = () => {
   };
 
 
-  if (!currentUser) return <div className="p-6">Loading...</div>;
+  if (!currentUser|| loading) return <SkeletonLoader />;
 
   return (
     <div className="flex h-[calc(100vh-3rem)] mt-12 md:pt-4 bg-gray-100 dark:bg-[#0f0f0f]">
@@ -197,82 +203,106 @@ const SendToUser = () => {
         </div>
 
         {/* Messages */}
+          <div
+  ref={scrollRef}
+  className="flex-1 overflow-y-auto p-3 space-y-3 bg-[#f9f9f9] dark:bg-[#181818]"
+>
+  {messages.map((msg) => {
+    const isSent = msg.from === currentUser.uid;
+    const msgType = msg.type?.toLowerCase().trim();
+    const msgStatus = msg.status?.toLowerCase().trim();
+
+    const maxContentLength = 50;
+    const content =
+      msg.text && !msg.amount ? msg.text : msg.note || "";
+    const expanded = !!expandedMsgs?.[msg.id];
+
+    const cardColor =
+      msgType === "payment"
+        ? msgStatus === "failed"
+          ? "border-red-400"
+          : "border-green-400"
+        : isSent
+        ? "border-purple-400"
+        : "border-gray-400";
+
+    return (
+      <div
+        key={msg.id}
+        className={`flex ${isSent ? "justify-end" : "justify-start"}`}
+      >
         <div
-          ref={scrollRef}
-          className="flex-1 overflow-y-auto p-3 space-y-3 bg-[#f9f9f9] dark:bg-[#181818]"
+          className={`cursor-pointer px-4 py-3 text-sm 
+            rounded-xl shadow-sm bg-white dark:bg-[#222] border-l-4 ${cardColor}
+            transition-transform transform hover:scale-[1.01] ${msgType ? "w-[220px]" : "max-w-[150px]"}`}
         >
-          {messages.map((msg) => {
-            const isSent = msg.from === currentUser.uid;
-            const msgType = msg.type?.toLowerCase().trim();
-            const msgStatus = msg.status?.toLowerCase().trim();
+          {msg.amount && (
+            <>
+              <strong className="dark:text-white">
+                Payment {isSent ? `to ${recipient.name}` : "received"}
+              </strong>
+              <p className="text-lg font-bold text-gray-800 dark:text-gray-100">
+                ₹{Math.abs(msg.amount)}
+              </p>
 
-            const maxContentLength = 50;
-            const content =
-              msg.text && !msg.amount ? msg.text : msg.note || "";
-            const isLong = content.length > maxContentLength;
-            const expanded = !!expandedMsgs[msg.id];
-
-            const cardColor =
-              msgType === "payment"
-                ? msgStatus === "failed"
-                  ? "border-red-400"
-                  : "border-green-400"
-                : isSent
-                ? "border-purple-400"
-                : "border-gray-400";
-
-            return (
-              <div
-                key={msg.id}
-                className={`flex ${isSent ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                
-                  className={`cursor-pointer px-4 py-3 max-w-[80%] text-sm 
-                    rounded-xl shadow-sm bg-white dark:bg-[#222] border-l-4 ${cardColor}
-                    transition-transform transform hover:scale-[1.01]`}
-                >
-                  {msg.amount && (
-                    <p className="text-lg font-bold text-gray-800 dark:text-gray-100">
-                      ₹{Math.abs(msg.amount)}
-                    </p>
-                  )}
-
-                  {content && (
-                    <p className="text-sm mt-1 text-gray-700 dark:text-gray-200 break-words">
-                      {expanded || content.length <= maxContentLength
-                        ? content
-                        : content.slice(0, maxContentLength) + "..."}
-                    </p>
-                  )}
-               {msg.type === "payment" && (
-               <button
-              onClick={() => {
-              if (msg.txnId) {
-              navigate(`/transaction/${msg.txnId}`, { state: msg });
-             }
-              }}
-            className="mt-2 px-3 py-1 text-xs bg-purple-600 hover:bg-purple-700 text-white rounded shadow"
-             >
-                  Show Details
-               </button>
-               )}
-
-                      
-                
-
-                  <p className="text-[10px] text-right mt-2 text-gray-400">
-                    {msg.timestamp?.toDate
-                      ? formatDistanceToNow(new Date(msg.timestamp.toDate()), {
-                          addSuffix: true,
-                        })
-                      : ""}
-                  </p>
+              {msgStatus === "success" && (
+                <div className="flex items-center gap-1 mt-1 text-green-600 text-xs font-medium">
+                  <FiCheckCircle className="text-base" />
+                  Paid
                 </div>
-              </div>
-            );
-          })}
+              )}
+
+              {msgStatus === "failed" && (
+                <div className="flex flex-col mt-1 text-red-600 text-xs font-medium">
+                  <div className="flex items-center gap-1">
+                    <FiXCircle className="text-base" />
+                    Failed
+                  </div>
+                  {msg.note && (
+                    <span className="text-[10px] mt-0.5 text-red-400">
+                      Reason: {msg.note}
+                    </span>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          {content && (
+            <p className="text-sm mt-1 dark:text-gray-200 break-words">
+              {expanded || content.length <= maxContentLength
+                ? content
+                : content.slice(0, maxContentLength) + "..."}
+            </p>
+          )}
+
+          {msg.type === "payment" && (
+            <button
+              onClick={() => {
+                if (msg.txnId) {
+                  navigate(`/transaction/${msg.txnId}`, { state: msg });
+                }
+              }}
+              className="mt-2 px-3 py-1 text-xs bg-purple-600 hover:bg-purple-700 text-white rounded shadow"
+            >
+              Show Details
+            </button>
+          )}
+
+          <p className="text-[10px] text-right mt-2 text-gray-400">
+            {msg.timestamp?.toDate
+              ? formatDistanceToNow(new Date(msg.timestamp.toDate()), {
+                  addSuffix: true,
+                })
+              : ""}
+          </p>
         </div>
+      </div>
+    );
+  })}
+</div>
+
+
 
         {/* Footer */}
         {recipient && (
