@@ -142,7 +142,7 @@ const SplitTransaction = () => {
       );
 
       toast.success("Split recorded!");
-      navigate(-1);
+      navigate("/my-splits");
     } catch (err) {
       console.error(err);
       toast.error("Failed to record split");
