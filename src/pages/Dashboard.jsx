@@ -8,7 +8,6 @@ import RecentTransactions from "../components/RecentTransactions";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import DashboardUsers from "./DashboardUsers";
-
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [balance, setBalance] = useState(0);
@@ -112,6 +111,7 @@ const Dashboard = () => {
         
         <DashboardUsers />
         <RecentTransactions />
+
       </div>
 
       <Footer />
