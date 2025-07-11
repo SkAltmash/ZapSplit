@@ -49,6 +49,7 @@ const ZupPay = () => {
           paymentId: `zuppay_${Date.now()}`,
           orderId: `order_${Date.now()}`,
           timestamp: serverTimestamp(),
+          status: "success",
         });
 
         toast.success("Payment Successful 🎉");

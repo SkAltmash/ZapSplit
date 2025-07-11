@@ -115,15 +115,16 @@ const ZupPayLaterCard = () => {
   </div>
 
   {/* Decorative Gradient Bar */}
-  <div className=" mt-2 absolute left-0 right-0 bottom-14 h-1 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full opacity-50"></div>
+  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-tl-2xl rounded-tr-2xl" />
 
+  {/* Action Button */}
   {/* Fixed Button */}
   <div className="absolute left-0 right-0 bottom-0">
     <button
       onClick={() => navigate("/zap-pay-later")}
       className="w-full px-4 py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-b-2xl transition"
     >
-      Repay Now
+      Viwe More
     </button>
   </div>
 </motion.div>

@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import {
-  doc, getDoc,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 
@@ -56,22 +60,40 @@ const AddMoney = () => {
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong.");
-    } finally {
       setLoading(false);
     }
   };
 
   const openRazorpay = (order, enteredAmount) => {
     const options = {
-      key: "rzp_test_wiGiGzDja1aqFw",
+      key: "rzp_test_wiGiGzDja1aqFw", // replace with prod key in production
       amount: order.amount,
       currency: "INR",
       name: "ZapSplit",
       description: "Add Money to Wallet",
       order_id: order.id,
-      handler: () => {
+      handler: async () => {
         toast.success("Payment Success via Razorpay!");
-        navigate(`/success?amount=${enteredAmount}`);
+        try {
+          const txnRef = collection(db, "users", user.uid, "transactions");
+          await addDoc(txnRef, {
+            type: "add",
+            amount: enteredAmount,
+            upi: "Razorpay",
+            note: "Wallet top-up (Razorpay)",
+            paymentId: `Razor${Date.now()}`,
+            orderId: `order_${Date.now()}`,
+            timestamp: serverTimestamp(),
+            status: "success",
+          });
+          setCurrentBalance((prev) => prev + enteredAmount);
+          navigate(`/success?amount=${enteredAmount}`);
+        } catch (err) {
+          console.error(err);
+          toast.error("Failed to record transaction.");
+        } finally {
+          setLoading(false);
+        }
       },
       prefill: {
         name: user?.displayName || "ZapSplit User",
@@ -107,7 +129,8 @@ const AddMoney = () => {
         <h1 className="text-2xl font-bold mb-4">Add Money to Wallet</h1>
 
         <p className="text-sm mb-2">
-          Current Balance: <span className="font-semibold">₹{currentBalance}</span>
+          Current Balance:{" "}
+          <span className="font-semibold">₹{currentBalance.toFixed(2)}</span>
         </p>
 
         <label className="block text-sm font-medium mb-1">Amount</label>
@@ -134,22 +157,25 @@ const AddMoney = () => {
         <div className="space-y-3">
           <button
             onClick={handleRazorpay}
-            disabled={loading}
+            disabled={loading || !user}
             className="w-full py-2 flex items-center justify-center gap-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
           >
             {loading ? (
-              "Processing…"
+              <span>Processing…</span>
             ) : (
               <>
-               
-                Pay with <span className="font-semibold">Razorpay <span className="text-xs">(Recommended)</span></span>
+                Pay with{" "}
+                <span className="font-semibold">
+                  Razorpay <span className="text-xs">(Recommended)</span>
+                </span>
               </>
             )}
           </button>
 
           <button
             onClick={handleZupPay}
-            className="w-full py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800"
+            disabled={loading || !user}
+            className="w-full py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50"
           >
             Pay with <span className="font-semibold">ZupPay</span> (Inbuilt)
           </button>

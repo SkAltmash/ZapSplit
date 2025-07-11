@@ -27,6 +27,8 @@ const typeIcon = {
   split: <FiUsers className="text-blue-500 text-xl" />,
   "split-payment": <FiUsers className="text-purple-500 text-xl" />,
   "split-receive": <FiUsers className="text-purple-500 text-xl" />,
+  "paylater": <FiArrowDownLeft className="text-green-500 text-xl" />,
+  "paylater-payment": <FiArrowUpRight className="text-orange-500 text-xl" />,
 };
 
 const RecentTransactions = () => {
@@ -88,6 +90,18 @@ const RecentTransactions = () => {
   const formatDate = (timestamp) =>
     timestamp?.toDate()?.toLocaleString("en-IN") || "—";
 
+  const handleClick = (tx) => {
+    if (tx.type === "paylater-payment") {
+      navigate(`/paylater-txn/${tx.id}`);
+    } 
+    else if (tx.type === "paylater") {
+      navigate(`/paylater-txn/${tx.id}`);
+    }
+    else {
+      navigate(`/transaction/${tx.id}`, { state: tx });
+    }
+  };
+
   return (
     <div className="mt-10">
       <div className="flex justify-between items-center mb-4">
@@ -104,6 +118,8 @@ const RecentTransactions = () => {
           <option value="split">Split (Initiator)</option>
           <option value="split-payment">Split (Paid by you)</option>
           <option value="split-receive">Split (Received by you)</option>
+          <option value="paylater">PayLater (Credit)</option>
+          <option value="paylater-payment">PayLater (Repayment)</option>
         </select>
       </div>
 
@@ -129,12 +145,8 @@ const RecentTransactions = () => {
             return (
               <div
                 key={tx.id}
-                onClick={() =>
-                  navigate(`/transaction/${tx.id}`, {
-                    state: tx,
-                  })
-                }
-                className={`flex items-centerjustify-between p-4 border shadow-sm hover:shadow-md transition cursor-pointer
+                onClick={() => handleClick(tx)}
+                className={`flex items-center justify-between p-4 border shadow-sm hover:shadow-md transition cursor-pointer
                   ${tx.split === true
                     ? "bg-blue-50 dark:bg-blue-900 border-blue-300 dark:border-blue-600"
                     : "bg-white dark:bg-[#1a1a1a]  border-gray-300 dark:border-white/10"}
@@ -154,22 +166,36 @@ const RecentTransactions = () => {
                       {tx.to || tx.from || tx.email || "—"} •{" "}
                       {formatDate(tx.timestamp)}
                     </p>
+
+                    {tx.type === "paylater" && (
+                      <p className="text-xs text-green-600">
+                        PayLater credit received
+                      </p>
+                    )}
+
+                    {tx.type === "paylater-payment" && (
+                      <p className="text-xs text-orange-500">
+                        Paid towards PayLater
+                      </p>
+                    )}
+
                     {tx.split === true && (
                       <p className="text-xs text-blue-600 dark:text-blue-300">
-                        👥 Split among{" "}
-                        {tx.participants?.length || "multiple"} people
+                        Split among {tx.participants?.length || "multiple"} people
                       </p>
                     )}
                   </div>
                 </div>
-                <div className="text-right">
+
+                <div className="text-lg font-semibold flex flex-col items-end w-full">
                   <p
                     className={`text-sm font-semibold ${
                       tx.amount < 0
                         ? "text-red-500"
                         : tx.type === "receive" ||
-                          tx.type === "split-receive"
-                        ? "text-yellow-500"
+                          tx.type === "split-receive" ||
+                          tx.type === "paylater"
+                        ? "text-green-500"
                         : "text-green-500"
                     }`}
                   >
