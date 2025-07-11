@@ -14,6 +14,9 @@ const avatarOptions = [
   "https://api.dicebear.com/7.x/bottts-neutral/svg?seed=ZuppMaster",
 ];
 
+const CLOUD_NAME = "dnaftbdo8";
+const UPLOAD_PRESET = "unsigned_zapsplit"; // 🔷 Create this in your Cloudinary dashboard!
+
 const ProfileSetup = () => {
   const user = auth.currentUser;
   const [name, setName] = useState(user?.displayName || "");
@@ -21,33 +24,46 @@ const ProfileSetup = () => {
   const [pin, setPin] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState(avatarOptions[0]);
   const [loading, setLoading] = useState(false);
+  const [customImage, setCustomImage] = useState(null);
+  const [useCustom, setUseCustom] = useState(false);
+
   const navigate = useNavigate();
 
   const handleSave = async (e) => {
     e.preventDefault();
     if (!name || !upi || !pin) return toast.error("All fields are required");
     if (pin.length !== 4 || !/^\d{4}$/.test(pin)) return toast.error("PIN must be 4 digits");
-
     if (!user) return toast.error("User not logged in");
 
     setLoading(true);
     try {
-      // Update Firebase Auth
+      let photoURL = selectedAvatar;
+
+      if (useCustom && customImage) {
+        const uploadedUrl = await uploadToCloudinary(customImage);
+        if (uploadedUrl) {
+          photoURL = uploadedUrl;
+        } else {
+          toast.error("Failed to upload image to Cloudinary");
+          setLoading(false);
+          return;
+        }
+      }
+
       await updateProfile(user, {
         displayName: name,
-        photoURL: selectedAvatar,
+        photoURL,
       });
 
-      // Save to Firestore
       await setDoc(
         doc(db, "users", user.uid),
         {
           name,
           email: user.email,
           upi,
-          zupPin: pin, // 💡 In production, this should be hashed
+          zupPin: pin,
           wallet: 0.0,
-          photoURL: selectedAvatar,
+          photoURL,
           updatedAt: new Date(),
         },
         { merge: true }
@@ -61,6 +77,27 @@ const ProfileSetup = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const uploadToCloudinary = async (file) => {
+    const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.secure_url) {
+        return data.secure_url;
+      }
+    } catch (err) {
+      console.error("Cloudinary upload error:", err);
+    }
+    return null;
   };
 
   return (
@@ -107,23 +144,71 @@ const ProfileSetup = () => {
             />
           </div>
 
+          {/* toggle */}
           <div>
-            <label className="block text-sm mb-2">Choose an Avatar</label>
-            <div className="grid grid-cols-3 gap-4">
-              {avatarOptions.map((url, index) => (
-                <img
-                  key={index}
-                  src={url}
-                  alt={`Avatar ${index + 1}`}
-                  onClick={() => setSelectedAvatar(url)}
-                  className={`cursor-pointer rounded-full w-20 h-20 p-1 border-4 transition ${
-                    selectedAvatar === url ? "border-purple-500" : "border-transparent"
-                  }`}
-                />
-              ))}
-            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={useCustom}
+                onChange={(e) => setUseCustom(e.target.checked)}
+                className="accent-purple-600"
+              />
+              Upload custom image instead of avatar
+            </label>
           </div>
 
+          {!useCustom && (
+            <div>
+              <label className="block text-sm mb-2">Choose an Avatar</label>
+              <div className="grid grid-cols-3 gap-4">
+                {avatarOptions.map((url, index) => (
+                  <img
+                    key={index}
+                    src={url}
+                    alt={`Avatar ${index + 1}`}
+                    onClick={() => {
+                      setSelectedAvatar(url);
+                      setCustomImage(null);
+                    }}
+                    className={`cursor-pointer rounded-full w-20 h-20 p-1 border-4 transition ${
+                      selectedAvatar === url ? "border-purple-500" : "border-transparent"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Custom Image Upload */}
+          {useCustom && !customImage && (
+            <div className="text-sm text-gray-500 mt-2">
+              <p className="mb-1">You can upload your own image as an avatar.</p>
+              <p className="text-xs">Recommended size: 200x200 pixels</p>
+            </div>
+          )}
+          {useCustom && customImage && (
+            <div className="mb-4">
+              <img
+                src={URL.createObjectURL(customImage)}
+                alt="Custom Avatar"
+                className="w-20 h-20 rounded-full border-4 border-purple-500 mb-2"
+              />
+              <p className="text-xs text-gray-500">Custom image selected</p>
+            </div>
+          )}  
+          {useCustom && (
+            <div>
+              <label className="block text-sm mb-1">Upload Your Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  setCustomImage(e.target.files[0]);
+                  setSelectedAvatar("");
+                }}
+              />
+            </div>
+          )}
+        
           <button
             type="submit"
             disabled={loading}
