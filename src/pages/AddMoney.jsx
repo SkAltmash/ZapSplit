@@ -141,12 +141,8 @@ const AddMoney = () => {
               "Processing…"
             ) : (
               <>
-                <img
-                  src="https://images.prismic.io/contrary-research/65ced9109be9a5b998b5e6ce_razorpaycover.png?auto=format,compress"
-                  alt="razorpay"
-                  className="w-6 h-6 bg-white rounded"
-                />
-                Pay with <span className="font-semibold">Razorpay (Recommended)</span>
+               
+                Pay with <span className="font-semibold">Razorpay <span className="text-xs">(Recommended)</span></span>
               </>
             )}
           </button>
