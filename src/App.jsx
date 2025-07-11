@@ -25,6 +25,7 @@ import MySplits from './pages/MySplits';
 import PaySplit from './pages/PaySplit';
 import AddMoney from './pages/AddMoney';
 import AnalysisPage from './pages/AnalysisPage';
+import ZupPay from './pages/ZupPay';
 function App() {
   return (
     <>
@@ -54,6 +55,8 @@ function App() {
       <Route path="/pay-split/:splitId" element={<PaySplit />} />
       <Route path="/add-money" element={<AddMoney />} />
       <Route path='/analysis' element={<AnalysisPage />} />
+      <Route path="/zuppay" element={<ZupPay />} />
+
       {/* Catch-all route for 404 */}
       <Route path="*" element={<div className="text-center mt-10 text-gray-600 dark:text-gray-300">Page not found</div>} />
 

@@ -136,7 +136,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen mt-12 flex flex-col items-center px-4 py-8 text-gray-800 dark:text-white">
+    <div className="min-h-screen mt-12 w-screen flex flex-col items-center px-4 py-8 dark:bg-black text-gray-800 dark:text-white">
       <div className="max-w-md w-full bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-md p-6">
         <div className="flex flex-col items-center mb-6">
           <div className="relative">
