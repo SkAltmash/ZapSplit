@@ -121,69 +121,75 @@ const RecentTransactions = () => {
           No transactions found.
         </p>
       ) : (
-        <div className="space-y-4">
-          {transactions.map((tx) => (
-            <div
-              key={tx.id}
-              onClick={() =>
-                navigate(`/transaction/${tx.id}`, {
-                  state: tx,
-                })
-              }
-              className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition cursor-pointer
-                ${
-                  tx.split === true
+        <div className="space-y-0 flex flex-col gap-1">
+          {transactions.map((tx, index) => {
+            const isFirst = index === 0;
+            const isLast = index === transactions.length - 1;
+
+            return (
+              <div
+                key={tx.id}
+                onClick={() =>
+                  navigate(`/transaction/${tx.id}`, {
+                    state: tx,
+                  })
+                }
+                className={`flex items-centerjustify-between p-4 border shadow-sm hover:shadow-md transition cursor-pointer
+                  ${tx.split === true
                     ? "bg-blue-50 dark:bg-blue-900 border-blue-300 dark:border-blue-600"
-                    : "bg-white dark:bg-[#1a1a1a]"
-                }`}
-            >
-              <div className="flex items-center gap-3">
-                {typeIcon[tx.type] || (
-                  <FiPlusCircle className="text-gray-400 text-xl" />
-                )}
-                <div>
-                  <p className="font-medium truncate max-w-[200px]">
-                    {tx.note || tx.type}
+                    : "bg-white dark:bg-[#1a1a1a]  border-gray-300 dark:border-white/10"}
+                  ${isFirst ? "rounded-t-xl" : ""}
+                  ${isLast ? "rounded-b-xl" : ""}
+                `}
+              >
+                <div className="flex items-center gap-3">
+                  {typeIcon[tx.type] || (
+                    <FiPlusCircle className="text-gray-400 text-xl" />
+                  )}
+                  <div>
+                    <p className="font-medium truncate max-w-[200px]">
+                      {tx.note || tx.type}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {tx.to || tx.from || tx.email || "—"} •{" "}
+                      {formatDate(tx.timestamp)}
+                    </p>
+                    {tx.split === true && (
+                      <p className="text-xs text-blue-600 dark:text-blue-300">
+                        👥 Split among{" "}
+                        {tx.participants?.length || "multiple"} people
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p
+                    className={`text-sm font-semibold ${
+                      tx.amount < 0
+                        ? "text-red-500"
+                        : tx.type === "receive" ||
+                          tx.type === "split-receive"
+                        ? "text-yellow-500"
+                        : "text-green-500"
+                    }`}
+                  >
+                    {tx.amount < 0 ? "-" : "+"}₹{Math.abs(tx.amount)}
                   </p>
-                  <p className="text-xs text-gray-500">
-                    {tx.to || tx.from || tx.email || "—"} •{" "}
-                    {formatDate(tx.timestamp)}
-                  </p>
-                  {tx.split === true && (
-                    <p className="text-xs text-blue-600 dark:text-blue-300">
-                      👥 Split among{" "}
-                      {tx.participants?.length || "multiple"} people
+                  {tx.status && (
+                    <p
+                      className={`text-xs mt-0.5 font-medium ${
+                        tx.status === "success"
+                          ? "text-green-600"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}
                     </p>
                   )}
                 </div>
               </div>
-              <div className="text-right">
-                <p
-                  className={`text-sm font-semibold ${
-                    tx.amount < 0
-                      ? "text-red-500"
-                      : tx.type === "receive" ||
-                        tx.type === "split-receive"
-                      ? "text-yellow-500"
-                      : "text-green-500"
-                  }`}
-                >
-                  {tx.amount < 0 ? "-" : "+"}₹{Math.abs(tx.amount)}
-                </p>
-                {tx.status && (
-                  <p
-                    className={`text-xs mt-0.5 font-medium ${
-                      tx.status === "success"
-                        ? "text-green-600"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}
-                  </p>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

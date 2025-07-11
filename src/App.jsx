@@ -26,6 +26,9 @@ import PaySplit from './pages/PaySplit';
 import AddMoney from './pages/AddMoney';
 import AnalysisPage from './pages/AnalysisPage';
 import ZupPay from './pages/ZupPay';
+import ApplyPayLater from './pages/ApplyPayLater';
+import ZapPayLaterDashboard from './pages/ZapPayLaterDashboard';
+import PayLaterTransactionDetails from './pages/PayLaterTransactionDetails';
 function App() {
   return (
     <>
@@ -56,9 +59,12 @@ function App() {
       <Route path="/add-money" element={<AddMoney />} />
       <Route path='/analysis' element={<AnalysisPage />} />
       <Route path="/zuppay" element={<ZupPay />} />
+      <Route path='/apply-paylater' element={<ApplyPayLater />} />
+      <Route path='/zap-pay-later' element={<ZapPayLaterDashboard />} />
+      <Route path="/paylater-txn/:txnId" element={<PayLaterTransactionDetails />} />
 
       {/* Catch-all route for 404 */}
-      <Route path="*" element={<div className="text-center mt-10 text-gray-600 dark:text-gray-300">Page not found</div>} />
+      <Route path="*" element={<div className="text-center mt-20 text-gray-600 dark:text-gray-300 ">Page not found</div>} />
 
   </Routes>
     </>

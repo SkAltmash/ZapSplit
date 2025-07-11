@@ -44,11 +44,8 @@ const NotificationsPage = () => {
 
     await updateDoc(notifRef, { seen: true });
 
-    // Optimistically update UI
     setNotifications((prev) =>
-      prev.map((n) =>
-        n.id === notifId ? { ...n, seen: true } : n
-      )
+      prev.map((n) => (n.id === notifId ? { ...n, seen: true } : n))
     );
   };
 
@@ -64,10 +61,10 @@ const NotificationsPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-white mt-12 dark:bg-[#0d0d0d] text-gray-800 dark:text-white px-4 py-10">
-      <div className="max-w-xl mx-auto">
+    <div className="min-h-screen dark:bg-black text-gray-800 dark:text-white px-4 py-10">
+      <div className="max-w-xl mx-auto  bg-white mt-12 dark:bg-[#0d0d0d] p-4 rounded-2xl">
         <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
-          <FaBell className="text-black dark:text-white" />
+          <FaBell className="text-black dark:text-white " />
           Your Notifications
         </h1>
 
@@ -78,35 +75,42 @@ const NotificationsPage = () => {
             No notifications found.
           </p>
         ) : (
-          <ul className="space-y-4">
-            {notifications.map((n) => (
-              <li
-                key={n.id}
-                onClick={() => markAsSeen(n.id)}
-                className={`cursor-pointer px-4 py-3 rounded-lg shadow border transition duration-200 ${
-                  n.seen
-                    ? "bg-gray-100 dark:bg-[#1a1a1a] border-gray-300 dark:border-white/10"
-                    : "bg-yellow-100 dark:bg-yellow-900 border-yellow-400 dark:border-yellow-600"
-                }`}
-              >
-                <p
-                  className={`text-sm ${
-                    n.seen
-                      ? "font-normal"
-                      : "font-semibold text-yellow-800 dark:text-yellow-100"
-                  }`}
+          <ul className="flex flex-col gap-1">
+            {notifications.map((n, index) => {
+              const isFirst = index === 0;
+              const isLast = index === notifications.length - 1;
+
+              return (
+                <li
+                  key={n.id}
+                  onClick={() => markAsSeen(n.id)}
+                  className={`cursor-pointer px-4 py-3 shadow border transition duration-200
+                    ${n.seen
+                      ? "bg-gray-100 dark:bg-[#1a1a1a] border-gray-300 dark:border-white/10"
+                      : "bg-yellow-100 dark:bg-yellow-900 border-yellow-400 dark:border-yellow-600"}
+                    ${isFirst ? "rounded-t-lg" : ""}
+                    ${isLast ? "rounded-b-lg" : ""}
+                  `}
                 >
-                  {n.message}
-                </p>
-                {n.createdAt && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {formatDistanceToNow(n.createdAt.toDate(), {
-                      addSuffix: true,
-                    })}
+                  <p
+                    className={`text-sm ${
+                      n.seen
+                        ? "font-normal"
+                        : "font-semibold text-yellow-800 dark:text-yellow-100"
+                    }`}
+                  >
+                    {n.message}
                   </p>
-                )}
-              </li>
-            ))}
+                  {n.createdAt && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {formatDistanceToNow(n.createdAt.toDate(), {
+                        addSuffix: true,
+                      })}
+                    </p>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>

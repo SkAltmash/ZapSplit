@@ -137,7 +137,7 @@ const PaySplit = () => {
           from: user.email,
           id: notifId,
           txnId: splitId,
-          message: `✅ ₹${split.perPerson} paid by ${user.email} towards "${split.note}"`,
+          message: `₹${split.perPerson} paid by ${user.email} towards "${split.note}"`,
           seen: false,
           createdAt: serverTimestamp(),
           type: "split-payment",
