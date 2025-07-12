@@ -202,7 +202,7 @@ const ReferralDetails = () => {
 
           <a
             href={`https://wa.me/?text=${encodeURIComponent(
-              "Join me on ZapSplit: " + shareLink
+              "Join me on ZapSplit is your personal wallet to split, zap, and send money instantly. Add funds and pay any UPI in just a flash. copy this code  : " +referralCode + shareLink
             )}`}
             target="_blank"
             rel="noopener noreferrer"

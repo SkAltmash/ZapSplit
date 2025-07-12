@@ -10,7 +10,7 @@ const ReferralProgram = () => {
   };
 
    return (
-    <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white mt-5 rounded-b-xl p-6 sm:p-8 shadow-lg space-y-6">
+    <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white mt-1 rounded-b-xl p-6 sm:p-8 shadow-lg space-y-6">
       {/* Header */}
       <div className="flex items-center gap-2 text-2xl font-bold">
         <FiZap className="text-yellow-300" />
