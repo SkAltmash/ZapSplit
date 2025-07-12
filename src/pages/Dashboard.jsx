@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import DashboardUsers from "./DashboardUsers";
 import ZupPayLaterCard from "../components/ZupPayLaterCard";
-import ZupWealth from "../components/ZupWealth";
+import ReferralProgram from "../components/ReferralProgram";
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [balance, setBalance] = useState(0);
@@ -169,7 +169,8 @@ const Dashboard = () => {
 
         <DashboardUsers />
         <ZupPayLaterCard />
-        <ZupWealth />
+        <ReferralProgram />
+        <RecentTransactions />
       </div>
 
       <Footer />

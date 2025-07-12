@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDocs, collection, query, where } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 
 const Signup = () => {
@@ -11,22 +11,47 @@ const Signup = () => {
     mobile: "",
     password: "",
     confirmPassword: "",
+    referralCode: "",
   });
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [refOwner, setRefOwner] = useState(null);
+  const [checkingRef, setCheckingRef] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const checkReferral = async (code) => {
+    if (!code) {
+      setRefOwner(null);
+      return;
+    }
+    setCheckingRef(true);
+    const q = query(collection(db, "users"), where("referralCode", "==", code.trim()));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const owner = snap.docs[0].data();
+      setRefOwner(owner);
+    } else {
+      setRefOwner(false);
+    }
+    setCheckingRef(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!/^[6-9]\d{9}$/.test(form.mobile)) {
       toast.error("Enter a valid Indian mobile number");
       return;
     }
     if (form.password !== form.confirmPassword) {
       toast.error("Passwords do not match");
+      return;
+    }
+    if (form.referralCode && refOwner === false) {
+      toast.error("Invalid referral code.");
       return;
     }
 
@@ -39,23 +64,31 @@ const Signup = () => {
       );
       const uid = userCredential.user.uid;
 
-      // Save mobile to Firestore
       await setDoc(doc(db, "users", uid), {
         email: form.email,
         mobile: form.mobile,
         wallet: 0,
         createdAt: new Date(),
+        invitedBy: form.referralCode || null,
       });
 
       toast.success("Account created successfully!");
       window.location.href = "/profile-setup";
-      setForm({ email: "", mobile: "", password: "", confirmPassword: "" });
     } catch (error) {
       toast.error(error.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (form.referralCode.trim()) {
+      const timeout = setTimeout(() => checkReferral(form.referralCode), 500);
+      return () => clearTimeout(timeout);
+    } else {
+      setRefOwner(null);
+    }
+  }, [form.referralCode]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#0d0d0d] flex items-center justify-center px-4">
@@ -136,6 +169,28 @@ const Signup = () => {
               onChange={handleChange}
               className="w-full px-4 py-2 rounded-md bg-white dark:bg-[#1c1c1c] border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm mb-1 text-gray-600 dark:text-gray-300">
+              Referral Code (optional)
+            </label>
+            <input
+              name="referralCode"
+              type="text"
+              value={form.referralCode}
+              onChange={handleChange}
+              className="w-full px-4 py-2 rounded-md bg-white dark:bg-[#1c1c1c] border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+            {checkingRef ? (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Checking code...</p>
+            ) : refOwner === false ? (
+              <p className="text-xs text-red-500 mt-1">Invalid referral code</p>
+            ) : refOwner ? (
+              <p className="text-xs text-green-600 mt-1">
+                Referred by: {refOwner.displayName || refOwner.email || "User"}
+              </p>
+            ) : null}
           </div>
 
           <button

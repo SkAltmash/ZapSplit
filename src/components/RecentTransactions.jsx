@@ -95,7 +95,8 @@ const RecentTransactions = () => {
   const handleClick = (tx) => {
     if (
       tx.type === "paylater-payment" ||
-      tx.type === "paylater" 
+      tx.type === "paylater" ||
+      tx.type === "paylater-extend"
     ) {
       navigate(`/paylater-txn/${tx.id}`);
     } else {
