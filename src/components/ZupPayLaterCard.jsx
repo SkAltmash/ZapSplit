@@ -54,7 +54,7 @@ const ZupPayLaterCard = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6 rounded-xl shadow-lg"
+        className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6 rounded-t-xl shadow-lg"
       >
         <h3 className="text-2xl font-bold">Get up to ₹30,000 ZupPayLater</h3>
         <p className="mt-2 text-sm">
@@ -83,7 +83,7 @@ const ZupPayLaterCard = () => {
    <motion.div
   initial={{ opacity: 0, y: 20 }}
   animate={{ opacity: 1, y: 0 }}
-  className="relative bg-gradient-to-br from-white via-gray-50 to-purple-50 dark:from-[#121212] dark:via-[#1a1a1a] dark:to-[#1f1f1f] border border-purple-100 dark:border-white/10 p-6 rounded-2xl shadow-xl overflow-hidden"
+  className="relative bg-gradient-to-br from-white via-gray-50 to-purple-50 dark:from-[#121212] dark:via-[#1a1a1a] dark:to-[#1f1f1f] border border-purple-100 dark:border-white/10 p-6 rounded-t-2xl shadow-xl overflow-hidden"
 >
   {/* Header */}
   <h3 className="text-xl font-bold text-purple-700 dark:text-purple-400 flex items-center gap-2 mb-4">
@@ -122,7 +122,7 @@ const ZupPayLaterCard = () => {
   <div className="absolute left-0 right-0 bottom-0">
     <button
       onClick={() => navigate("/zap-pay-later")}
-      className="w-full px-4 py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-b-2xl transition"
+      className="w-full px-4 py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold transition"
     >
       Viwe More
     </button>

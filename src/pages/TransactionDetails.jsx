@@ -67,11 +67,16 @@ const TransactionDetails = () => {
         <div
         
         >
-      <div>
+<div>
   {txn.type === "add" ? (
     <iframe
       className="w-full rounded-2xl mb-3"
       src="https://lottie.host/embed/32d214e8-ec1b-4da2-924e-8705344e13a8/SHbtp3KCfK.lottie"
+    ></iframe>
+  ) : txn.type === "reward" ? (
+    <iframe
+      className="w-full rounded-2xl mb-3"
+      src="https://lottie.host/embed/cac7a69c-0db7-41a4-9cbe-d5c087af4773/XY0NhHuVRt.lottie"
     ></iframe>
   ) : txn.status === "success" ? (
     <iframe
@@ -144,7 +149,7 @@ const TransactionDetails = () => {
         </div>
         <div className="mt-6 flex gap-5">
           <button className="bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-purple-700 transition duration-200 "
-            onClick={() => navigate(`/help/${txn.id}`)}
+            onClick={() => navigate(`/help`)}
           >
             Need Help?
           </button>

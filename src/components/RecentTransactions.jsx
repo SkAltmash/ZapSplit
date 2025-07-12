@@ -16,6 +16,7 @@ import {
   FiUsers,
   FiLoader,
   FiRepeat,
+  FiGift,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
@@ -31,6 +32,7 @@ const typeIcon = {
   paylater: <FiArrowDownLeft className="text-green-500 text-xl" />,
   "paylater-payment": <FiArrowUpRight className="text-orange-500 text-xl" />,
   "paylater-extend": <FiRepeat className="text-blue-500 text-xl" />,
+  reward: <FiGift className="text-pink-500 text-xl" />,
 };
 
 const RecentTransactions = () => {
@@ -95,8 +97,7 @@ const RecentTransactions = () => {
   const handleClick = (tx) => {
     if (
       tx.type === "paylater-payment" ||
-      tx.type === "paylater" ||
-      tx.type === "paylater-extend"
+      tx.type === "paylater" 
     ) {
       navigate(`/paylater-txn/${tx.id}`);
     } else {
@@ -123,6 +124,7 @@ const RecentTransactions = () => {
           <option value="paylater">PayLater (Credit)</option>
           <option value="paylater-payment">PayLater (Repayment)</option>
           <option value="paylater-extend">PayLater (Extended)</option>
+          <option value="reward">Reward</option>
         </select>
       </div>
 
@@ -152,6 +154,8 @@ const RecentTransactions = () => {
                 className={`flex items-center justify-between p-4 border shadow-sm hover:shadow-md transition cursor-pointer
                   ${tx.split === true
                     ? "bg-blue-50 dark:bg-blue-900 border-blue-300 dark:border-blue-600"
+                    : tx.type === "reward"
+                    ? "bg-pink-50 dark:bg-pink-900 border-pink-300 dark:border-pink-600"
                     : "bg-white dark:bg-[#1a1a1a] border-gray-300 dark:border-white/10"}
                   ${isFirst ? "rounded-t-xl" : ""}
                   ${isLast ? "rounded-b-xl" : ""}
@@ -188,6 +192,12 @@ const RecentTransactions = () => {
                       </p>
                     )}
 
+                    {tx.type === "reward" && (
+                      <p className="text-xs text-pink-600 dark:text-pink-300">
+                         Reward received
+                      </p>
+                    )}
+
                     {tx.split === true && (
                       <p className="text-xs text-blue-600 dark:text-blue-300">
                         Split among {tx.participants?.length || "multiple"} people
@@ -203,7 +213,8 @@ const RecentTransactions = () => {
                         ? "text-red-500"
                         : tx.type === "receive" ||
                           tx.type === "split-receive" ||
-                          tx.type === "paylater"
+                          tx.type === "paylater" ||
+                          tx.type === "reward"
                         ? "text-green-500"
                         : "text-green-500"
                     }`}
