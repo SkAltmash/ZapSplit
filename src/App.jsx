@@ -31,6 +31,7 @@ import ZapPayLaterDashboard from './pages/ZapPayLaterDashboard';
 import PayLaterTransactionDetails from './pages/PayLaterTransactionDetails';
 import PayDue from './pages/PayDue';
 import ExtendDue from './pages/ExtendDue';
+import Invest from './pages/invest';
 function App() {
   return (
     <>
@@ -66,6 +67,7 @@ function App() {
       <Route path="/paylater-txn/:txnId" element={<PayLaterTransactionDetails />} />
       <Route path="/pay-due/:txnId" element={<PayDue />} />
       <Route path="/extend-due/:txnId" element={<ExtendDue />} />
+      <Route path="/invest" element={<Invest />} />
       {/* Catch-all route for 404 */}
       <Route path="*" element={<div className="text-center mt-20 text-gray-600 dark:text-gray-300 ">Page not found</div>} />
 
