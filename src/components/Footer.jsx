@@ -21,13 +21,13 @@ const Footer = () => {
             <li><a href="/learn-more" className="hover:text-purple-600 dark:hover:text-purple-400">Terms of Service</a></li>
           </ul>
           <div className="flex gap-4 mt-4">
-            <a href="#" target="_blank" className="hover:text-purple-600 dark:hover:text-purple-400">
+            <a href="https://github.com/SkAltmash" target="_blank" className="hover:text-purple-600 dark:hover:text-purple-400">
               <FaGithub size={18} />
             </a>
-            <a href="#" target="_blank" className="hover:text-purple-600 dark:hover:text-purple-400">
+            <a href="https://www.linkedin.com/in/altamash-sheikh-1ba6a72aa/" target="_blank" className="hover:text-purple-600 dark:hover:text-purple-400">
               <FaLinkedin size={18} />
             </a>
-            <a href="#" target="_blank" className="hover:text-purple-600 dark:hover:text-purple-400">
+            <a href="https://x.com/AltmashThe6081" target="_blank" className="hover:text-purple-600 dark:hover:text-purple-400">
               <FaTwitter size={18} />
             </a>
           </div>

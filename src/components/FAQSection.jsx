@@ -1,27 +1,50 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiChevronDown } from "react-icons/fi";
+import { Shield, Gift, TrendingUp, CreditCard, BarChart2, Users, Send } from "lucide-react";
 
 const faqItems = [
   {
     question: "How do I add money to my ZapSplit wallet?",
     answer:
       "You can add money using UPI or Razorpay. Once added, it reflects in your wallet instantly.",
+    icon: <CreditCard size={20} />,
   },
   {
     question: "Can I send money to anyone using UPI?",
     answer:
       "Yes, ZapSplit lets you transfer funds from your wallet to any valid UPI ID.",
+    icon: <Send size={20} />,
   },
   {
-    question: "Is my money secure in ZapSplit?",
+    question: "What is the referral program?",
     answer:
-      "Absolutely. We use top-tier security and payment infrastructure to ensure your funds are safe.",
+      "Invite friends to ZapSplit using your referral link. Once they complete their first transaction, you earn ₹201.",
+    icon: <Gift size={20} />,
+  },
+  {
+    question: "How does Pay Later work?",
+    answer:
+      "You get an approved credit limit to use even if your wallet is empty. Pay your dues before the due date.",
+    icon: <TrendingUp size={20} />,
+  },
+  {
+    question: "Can I see where I spent my money?",
+    answer:
+      "Yes, the analytics section shows your spending & earnings in detail.",
+    icon: <BarChart2 size={20} />,
+  },
+  {
+    question: "Are my funds & data secure?",
+    answer:
+      "Absolutely. We use top-tier security and encryption to protect your money and personal data.",
+    icon: <Shield size={20} />,
   },
   {
     question: "Does ZapSplit charge any fees?",
     answer:
       "ZapSplit is free for most personal transfers. For larger transactions or business use, fees may apply.",
+    icon: <Users size={20} />,
   },
 ];
 
@@ -31,9 +54,12 @@ const FAQItem = ({ item, isOpen, toggle }) => (
       onClick={toggle}
       className="w-full flex items-center justify-between text-left"
     >
-      <span className="text-lg font-medium text-gray-800 dark:text-white">
-        {item.question}
-      </span>
+      <div className="flex gap-2 items-center">
+        <span className="text-purple-600 dark:text-purple-400">{item.icon}</span>
+        <span className="text-lg font-medium text-gray-800 dark:text-white">
+          {item.question}
+        </span>
+      </div>
       <motion.div
         animate={{ rotate: isOpen ? 180 : 0 }}
         transition={{ duration: 0.2 }}

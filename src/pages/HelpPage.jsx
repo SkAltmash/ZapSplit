@@ -7,7 +7,6 @@ import {
   orderBy,
   limit,
   startAfter,
-  onSnapshot,
   getDocs,
 } from "firebase/firestore";
 import { FiMail, FiGithub, FiLinkedin } from "react-icons/fi";
@@ -79,6 +78,22 @@ const HelpPage = () => {
       q: "How do I view my transaction history?",
       a: "Scroll down to the transactions section on this page or on your dashboard.",
     },
+    {
+      q: "How does Invite & Earn work?",
+      a: "Invite your friends using your unique referral link. Once they sign up and make a successful payment, you can claim your reward from the Invite & Earn page.",
+    },
+    {
+      q: "What is PayLater and how do I use it?",
+      a: "PayLater gives you a credit limit that you can use now and pay back later. Check your available credit on the PayLater dashboard and view your transactions there.",
+    },
+    {
+      q: "Can I upload my own profile picture?",
+      a: "Yes! You can upload a custom profile picture from your device. It will be saved securely in our system and shown on your profile.",
+    },
+    {
+      q: "Is the Invite reward automatic?",
+      a: "No, after your invited friend makes a payment, you need to manually claim the reward by clicking the 'Claim' button on the Invite & Earn page.",
+    },
   ];
 
   return (
@@ -104,13 +119,13 @@ const HelpPage = () => {
           <h2 className="text-2xl font-semibold mb-4">Contact Us</h2>
           <div className="flex space-x-4">
             <a
-              href="mailto:youremail@example.com"
+              href="mailto:skaltmash3@gmail.com"
               className="p-3 rounded-full bg-purple-600 text-white hover:bg-purple-700"
             >
               <FiMail />
             </a>
             <a
-              href="https://www.linkedin.com/in/yourprofile"
+              href="https://www.linkedin.com/in/altamash-sheikh-1ba6a72aa"
               target="_blank"
               rel="noopener noreferrer"
               className="p-3 rounded-full bg-blue-600 text-white hover:bg-blue-700"
@@ -118,7 +133,7 @@ const HelpPage = () => {
               <FiLinkedin />
             </a>
             <a
-              href="https://github.com/yourgithub"
+              href="https://github.com/SkAltmash"
               target="_blank"
               rel="noopener noreferrer"
               className="p-3 rounded-full bg-gray-800 text-white hover:bg-black"

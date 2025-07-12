@@ -288,9 +288,9 @@ const AnalysisSection = () => {
                     </div>
                   )}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 dark:text-white">
                   <p className="font-medium">{u.name}</p>
-                  <p className="text-xs text-gray-500">₹{u.amount}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-200">₹{u.amount}</p>
                 </div>
               </li>
             ))}

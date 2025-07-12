@@ -10,7 +10,7 @@ const ReferralProgram = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-purple-700 to-indigo-700 text-white  mt-5 rounded-xl p-6 sm:p-8 shadow-lg space-y-6">
+    <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white  mt-5 rounded-xl p-6 sm:p-8 shadow-lg space-y-6">
       <div className="flex items-center gap-2 text-2xl font-bold">
         <FiZap className="text-yellow-300" />
         Zap Referral
@@ -37,7 +37,7 @@ const ReferralProgram = () => {
 
       <button
         onClick={handleNext}
-        className="flex justify-center items-center gap-2 px-4 py-3 bg-yellow-400 text-black font-medium rounded-lg shadow hover:bg-yellow-300 transition"
+        className="flex justify-center items-center gap-2 px-4 py-3 bg-pink-200 text-black font-medium rounded-lg shadow hover:bg-yellow-300 transition"
       >
         View More <FiChevronRight />
       </button>

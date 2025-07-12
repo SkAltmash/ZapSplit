@@ -15,6 +15,8 @@ import {
 } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { Loader, RefreshCw, Copy, Mail, User, Share2, CheckCircle, Phone } from "lucide-react";
+import { FiChevronRight, FiZap, FiUserPlus, FiCheckCircle } from "react-icons/fi";
+
 import toast from "react-hot-toast";
 
 const ReferralDetails = () => {
@@ -62,7 +64,6 @@ const ReferralDetails = () => {
     setInvitedUsers(invited);
     setLoadingUsers(false);
   };
-
   const init = async () => {
     setLoading(true);
     await fetchReferralCode();
@@ -126,7 +127,7 @@ const ReferralDetails = () => {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-[#1a1a1a] mt-15 text-black dark:text-white p-6 rounded-xl shadow-lg max-w-md mx-auto">
+      <div className="bg-white dark:bg-[#1a1a1a] mt-12 h-screen w-screen text-black dark:text-white p-6 rounded-xl shadow-lg">
         <div className="flex flex-col gap-4 animate-pulse">
           <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-1/3"></div>
           <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-2/3"></div>
@@ -138,7 +139,13 @@ const ReferralDetails = () => {
   }
 
   return (
-    <div className="bg-white dark:bg-[#1a1a1a] mt-16 text-black dark:text-white p-4 sm:p-6 rounded-xl shadow-lg max-w-md mx-auto space-y-6 relative">
+       <div className="w-screen bg-[#eee] min-h-screen p-4 dark:bg-[#1a1a1a] ">
+        {    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth" // or "instant"
+    })}
+        <div className="bg-white mt-15 dark:bg-black text-black dark:text-white p-4 sm:p-6 rounded-xl shadow-lg max-w-md mx-auto space-y-6 relative">
       <h2 className="text-2xl font-bold flex items-center gap-2">
         <Share2 className="w-6 h-6" /> Zap Referral
       </h2>
@@ -147,17 +154,33 @@ const ReferralDetails = () => {
         Earn rewards by inviting friends to ZapSplit!
       </p>
 
-      <div className="bg-gray-100 dark:bg-[#2a2a2a] p-4 rounded-lg space-y-2">
-        <div className="text-sm flex items-center gap-2">
-          <User className="w-4 h-4" /> 1. Invite a friend with your referral code
+     <div className="bg-gradient-to-r  from-purple-500 to-pink-500 text-white  mt-5 rounded-xl p-6 sm:p-8 shadow-lg space-y-6">
+          <div className="flex items-center gap-2 text-2xl font-bold">
+            <FiZap className="text-yellow-300" />
+            Zap Referral
+          </div>
+    
+          <p className="text-sm text-purple-100">
+            Invite your friends to join the vibe on ZapSplit and earn rewards when they make their first payment!
+          </p>
+    
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <FiUserPlus className="mt-1 text-green-300" />
+              <p>Invite a friend to ZapSplit</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <FiCheckCircle className="mt-1 text-blue-300" />
+              <p>They make their first payment</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <FiZap className="mt-1 text-yellow-300" />
+              <p>You earn <span className="font-semibold">₹201</span> instantly</p>
+            </div>
+          </div>
+    
+         
         </div>
-        <div className="text-sm flex items-center gap-2">
-          <User className="w-4 h-4" /> 2. They make their first payment
-        </div>
-        <div className="text-sm flex items-center gap-2">
-          <User className="w-4 h-4" /> 3. You earn <span className="font-bold">₹201</span>
-        </div>
-      </div>
 
       <div className="space-y-2">
         <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -209,7 +232,6 @@ const ReferralDetails = () => {
             <RefreshCw className={`w-4 h-4 ${loadingUsers && "animate-spin"}`} /> Refresh
           </button>
         </div>
-
         {loadingUsers ? (
           <div className="space-y-2">
             {[1, 2, 3].map((i) => (
@@ -273,6 +295,7 @@ const ReferralDetails = () => {
         )}
       </div>
     </div>
+       </div>
   );
 };
 

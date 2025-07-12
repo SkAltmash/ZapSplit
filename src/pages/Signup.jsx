@@ -4,7 +4,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { doc, setDoc, getDocs, collection, query, where } from "firebase/firestore";
 import { toast } from "react-hot-toast";
-
+import { useSearchParams } from "react-router-dom";
 const Signup = () => {
   const [form, setForm] = useState({
     email: "",
@@ -17,7 +17,8 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [refOwner, setRefOwner] = useState(null);
   const [checkingRef, setCheckingRef] = useState(false);
-
+  const [params] = useSearchParams();
+  const referralCode = params.get("ref");
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -178,7 +179,7 @@ const Signup = () => {
             <input
               name="referralCode"
               type="text"
-              value={form.referralCode}
+              value={referralCode || form.referralCode}
               onChange={handleChange}
               className="w-full px-4 py-2 rounded-md bg-white dark:bg-[#1c1c1c] border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FiUploadCloud, FiUsers, FiSend } from "react-icons/fi";
+import { FiUploadCloud, FiUsers, FiSend, FiGift, FiClock, FiBarChart2, FiBell } from "react-icons/fi";
 
 const AboutSection = () => {
   const features = [
@@ -17,6 +17,26 @@ const AboutSection = () => {
       title: "Send via UPI Instantly",
       desc: "Pay any UPI ID directly from your wallet. Fast, secure, and real-time.",
       icon: <FiSend size={28} />,
+    },
+    {
+      title: "Referral Rewards",
+      desc: "Invite friends, they complete their first payment, and you earn ₹201 instantly.",
+      icon: <FiGift size={28} />,
+    },
+    {
+      title: "Zap PayLater",
+      desc: "Buy now, pay later with your available credit — directly inside ZapSplit.",
+      icon: <FiClock size={28} />,
+    },
+    {
+      title: "Insightful Analytics",
+      desc: "Understand your spending and earnings with beautifully presented analytics.",
+      icon: <FiBarChart2 size={28} />,
+    },
+    {
+      title: "Stay Notified",
+      desc: "Get real-time notifications about your transactions, splits, and rewards.",
+      icon: <FiBell size={28} />,
     },
   ];
 
@@ -40,7 +60,7 @@ const AboutSection = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed max-w-3xl mx-auto mb-12"
         >
-          ZapSplit is your all-in-one money splitting solution. Easily top up your wallet, divide expenses with others, and send real money to any UPI ID — in just a few taps.
+          ZapSplit is your all-in-one money management solution. Top up your wallet, split bills, earn rewards, pay later, and stay on top of your finances — all in one app.
         </motion.p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -50,12 +70,16 @@ const AboutSection = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.3 + index * 0.2 }}
+              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
               className="bg-gray-50 dark:bg-[#1b1b1b] p-6 rounded-2xl shadow hover:shadow-md transition border border-gray-200 dark:border-white/10"
             >
               <div className="text-purple-600 dark:text-purple-400 mb-4">{item.icon}</div>
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">{item.title}</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">{item.desc}</p>
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+                {item.title}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
+                {item.desc}
+              </p>
             </motion.div>
           ))}
         </div>

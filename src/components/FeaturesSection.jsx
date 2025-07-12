@@ -1,17 +1,41 @@
 import { motion } from "framer-motion";
+import { CreditCard, Users, Send, TrendingUp, Gift, BarChart2, Bell } from "lucide-react";
 
 const steps = [
   {
     title: "Load Your Wallet",
     desc: "Add funds securely using Razorpay or UPI. Manage your balance anytime.",
+    icon: <CreditCard size={20} />,
   },
   {
     title: "Split with Friends",
     desc: "Create groups, define amounts or percentages, and track who owes what.",
+    icon: <Users size={20} />,
   },
   {
     title: "Send via UPI Instantly",
     desc: "Pay any UPI ID straight from your ZapSplit wallet. Fast and secure.",
+    icon: <Send size={20} />,
+  },
+  {
+    title: "Zap PayLater",
+    desc: "Use credit even when your wallet is empty. Pay your dues later easily.",
+    icon: <TrendingUp size={20} />,
+  },
+  {
+    title: "Referral Program",
+    desc: "Invite friends, they complete their first payment, you earn ₹201.",
+    icon: <Gift size={20} />,
+  },
+  {
+    title: "Track Analytics",
+    desc: "Understand where your money goes with detailed spending analytics.",
+    icon: <BarChart2 size={20} />,
+  },
+  {
+    title: "Real-Time Notifications",
+    desc: "Get instantly notified about transactions, splits, and rewards.",
+    icon: <Bell size={20} />,
   },
 ];
 
@@ -42,7 +66,10 @@ const FeaturesSection = () => {
               <div className="absolute left-[-24px] top-1 w-10 h-10 rounded-full bg-purple-600 dark:bg-purple-500 text-white flex items-center justify-center font-bold shadow-md">
                 {index + 1}
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-1">{step.title}</h3>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="text-purple-600 dark:text-purple-400">{step.icon}</div>
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{step.title}</h3>
+              </div>
               <p className="text-gray-600 dark:text-gray-300 text-sm">{step.desc}</p>
             </motion.div>
           ))}
