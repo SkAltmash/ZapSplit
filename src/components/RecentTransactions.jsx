@@ -15,6 +15,7 @@ import {
   FiArrowDownLeft,
   FiUsers,
   FiLoader,
+  FiRepeat,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
@@ -27,8 +28,9 @@ const typeIcon = {
   split: <FiUsers className="text-blue-500 text-xl" />,
   "split-payment": <FiUsers className="text-purple-500 text-xl" />,
   "split-receive": <FiUsers className="text-purple-500 text-xl" />,
-  "paylater": <FiArrowDownLeft className="text-green-500 text-xl" />,
+  paylater: <FiArrowDownLeft className="text-green-500 text-xl" />,
   "paylater-payment": <FiArrowUpRight className="text-orange-500 text-xl" />,
+  "paylater-extend": <FiRepeat className="text-blue-500 text-xl" />,
 };
 
 const RecentTransactions = () => {
@@ -88,16 +90,15 @@ const RecentTransactions = () => {
   }, [filterType]);
 
   const formatDate = (timestamp) =>
-    timestamp?.toDate()?.toLocaleString("en-IN") || "—";
+    timestamp?.toDate?.()?.toLocaleString("en-IN") || "—";
 
   const handleClick = (tx) => {
-    if (tx.type === "paylater-payment") {
+    if (
+      tx.type === "paylater-payment" ||
+      tx.type === "paylater" 
+    ) {
       navigate(`/paylater-txn/${tx.id}`);
-    } 
-    else if (tx.type === "paylater") {
-      navigate(`/paylater-txn/${tx.id}`);
-    }
-    else {
+    } else {
       navigate(`/transaction/${tx.id}`, { state: tx });
     }
   };
@@ -120,6 +121,7 @@ const RecentTransactions = () => {
           <option value="split-receive">Split (Received by you)</option>
           <option value="paylater">PayLater (Credit)</option>
           <option value="paylater-payment">PayLater (Repayment)</option>
+          <option value="paylater-extend">PayLater (Extended)</option>
         </select>
       </div>
 
@@ -149,7 +151,7 @@ const RecentTransactions = () => {
                 className={`flex items-center justify-between p-4 border shadow-sm hover:shadow-md transition cursor-pointer
                   ${tx.split === true
                     ? "bg-blue-50 dark:bg-blue-900 border-blue-300 dark:border-blue-600"
-                    : "bg-white dark:bg-[#1a1a1a]  border-gray-300 dark:border-white/10"}
+                    : "bg-white dark:bg-[#1a1a1a] border-gray-300 dark:border-white/10"}
                   ${isFirst ? "rounded-t-xl" : ""}
                   ${isLast ? "rounded-b-xl" : ""}
                 `}
@@ -176,6 +178,12 @@ const RecentTransactions = () => {
                     {tx.type === "paylater-payment" && (
                       <p className="text-xs text-orange-500">
                         Paid towards PayLater
+                      </p>
+                    )}
+
+                    {tx.type === "paylater-extend" && (
+                      <p className="text-xs text-blue-500">
+                        PayLater due extended
                       </p>
                     )}
 

@@ -11,7 +11,7 @@ import {
 import { toast } from "react-hot-toast";
 import { FiLoader } from "react-icons/fi";
 
-const PayDue = () => {
+const ExtendDue = () => {
   const { txnId } = useParams();
   const navigate = useNavigate();
 
@@ -19,6 +19,8 @@ const PayDue = () => {
   const [pin, setPin] = useState("");
   const [processing, setProcessing] = useState(false);
   const [storedPin, setStoredPin] = useState(null);
+  const [selectedDays, setSelectedDays] = useState(15);
+  const [extraCharge, setExtraCharge] = useState(0);
 
   const user = auth.currentUser;
 
@@ -37,11 +39,18 @@ const PayDue = () => {
       }
 
       setStoredPin(userSnap.data().zupPin);
-      setTxn({ id: txnSnap.id, ...txnSnap.data() });
+      const txnData = { id: txnSnap.id, ...txnSnap.data() };
+      setTxn(txnData);
+      calculateCharge(txnData.amount, selectedDays);
     };
 
     fetchTxn();
   }, [user, txnId, navigate]);
+
+  const calculateCharge = (baseAmount, days) => {
+    const charge = Math.ceil(baseAmount * 0.01 * days); // 1% per day
+    setExtraCharge(charge);
+  };
 
   const handleConfirm = async () => {
     if (!pin || pin.length !== 4) {
@@ -57,6 +66,8 @@ const PayDue = () => {
 
     try {
       const now = new Date();
+      const newDueDate = new Date(txn.dueDate.toDate());
+      newDueDate.setDate(newDueDate.getDate() + selectedDays);
 
       await runTransaction(db, async (transaction) => {
         const userRef = doc(db, "users", user.uid);
@@ -74,69 +85,63 @@ const PayDue = () => {
           throw new Error("This due is already paid");
         }
 
-        if (userData.wallet < txnData.amount) {
-          throw new Error("Insufficient wallet balance");
+        if (userData.wallet < extraCharge) {
+          throw new Error("Insufficient wallet balance to pay extension fee");
         }
 
-        if ((userData.usedCredit || 0) < txnData.amount) {
-          throw new Error("Invalid usedCredit — cannot pay more than due");
-        }
-
-        // update wallet & usedCredit
+        // deduct fee from wallet
         transaction.update(userRef, {
-          wallet: userData.wallet - txnData.amount,
-          usedCredit: (userData.usedCredit || 0) - txnData.amount,
+          wallet: userData.wallet - extraCharge,
         });
 
-        // mark transaction as paid
+        // update transaction with new due date & add extension record
         transaction.update(txnRef, {
-          status: "paid",
-          paidAt: now,
+          dueDate: newDueDate,
+          extensions: [
+            ...(txnData.extensions || []),
+            {
+              extendedAt: now,
+              addedDays: selectedDays,
+              newDueDate,
+              feePaid: extraCharge,
+            },
+          ],
         });
 
-        // add to transactions history
+        // add to transaction history
         const historyRef = doc(
           db,
           "users",
           user.uid,
           "transactions",
-           txnId
+          `extend_${txnId}_${Date.now()}`
         );
         transaction.set(historyRef, {
           id: historyRef.id,
-          type: "paylater-payment",
-          amount: -txnData.amount,
-          note: txnData.note || "PayLater repayment",
+          type: "paylater-extend",
+          amount: -extraCharge,
+          note: `Extended due by ${selectedDays} days`,
           timestamp: now,
           status: "success",
         });
       });
 
-      const notifId = `notif_paylater_${txnId}`;
+      const notifId = `notif_extend_${txnId}_${Date.now()}`;
       await setDoc(
         doc(db, "users", user.uid, "notifications", notifId),
         {
           id: notifId,
           txnId,
-          amount: txn.amount,
-          message: `You paid ₹${txn.amount} towards your PayLater due: "${txn.note}"`,
+          message: `You extended your PayLater due by ${selectedDays} days. Fee of ₹${extraCharge} debited.`,
           seen: false,
           createdAt: serverTimestamp(),
-          type: "paylater-payment",
+          type: "paylater-extend",
         }
       );
 
-      navigate(`/paylater-txn/${txn.id}`,);
+      navigate(`/paylater-txn/${txnId}`);
     } catch (err) {
-      toast.error(err.message || "Payment failed");
-      navigate("/payment-result", {
-        state: {
-          status: "failed",
-          reason: err.message || "Payment failed",
-          amount: txn?.amount || 0,
-          txnId,
-        },
-      });
+      toast.error(err.message || "Extension failed");
     } finally {
       setProcessing(false);
     }
@@ -153,10 +158,36 @@ const PayDue = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-[#0d0d0d] px-4">
       <div className="w-full max-w-sm p-6 bg-white dark:bg-[#1a1a1a] border rounded-xl shadow-lg text-center">
-        <h2 className="text-xl font-bold mb-2 dark:text-white">Enter your ZUP PIN</h2>
+        <h2 className="text-xl font-bold mb-2 dark:text-white">Extend Due Date</h2>
         <p className="text-sm text-gray-500 mb-6">
-          Paying ₹{txn.amount} towards <br /> "<span className="font-medium">{txn.note}</span>"
+          Current Amount: ₹{txn.amount} <br />
+          Note: "<span className="font-medium">{txn.note}</span>"
         </p>
+
+        <div className="space-y-2 mb-4">
+          <p className="text-sm font-medium dark:text-gray-300">Select Extra Days:</p>
+          <div className="flex justify-center gap-2">
+            {[15, 30, 45].map((days) => (
+              <button
+                key={days}
+                onClick={() => {
+                  setSelectedDays(days);
+                  calculateCharge(txn.amount, days);
+                }}
+                className={`px-3 py-1 rounded border ${
+                  selectedDays === days
+                    ? "bg-purple-600 text-white"
+                    : "bg-gray-100 dark:bg-[#2a2a2a] dark:text-white"
+                }`}
+              >
+                +{days} days
+              </button>
+            ))}
+          </div>
+          <p className="text-sm text-green-600">
+            Extension Fee: ₹{extraCharge}
+          </p>
+        </div>
 
         <input
           type="password"
@@ -173,7 +204,7 @@ const PayDue = () => {
           className={`w-full text-white font-semibold py-3 rounded-md ${
             processing
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-green-600 hover:bg-green-700"
+              : "bg-purple-600 hover:bg-purple-700"
           }`}
         >
           {processing ? (
@@ -181,7 +212,7 @@ const PayDue = () => {
               <FiLoader className="animate-spin" /> Processing...
             </span>
           ) : (
-            `Pay ₹${txn.amount}`
+            `Extend Due by ${selectedDays} days`
           )}
         </button>
       </div>
@@ -189,4 +220,4 @@ const PayDue = () => {
   );
 };
 
-export default PayDue;
+export default ExtendDue;

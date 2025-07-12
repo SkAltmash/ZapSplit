@@ -60,7 +60,7 @@ const ApplyPayLater = () => {
 
       if (approved) {
         toast.success(`Approved! ZupPayLater Limit: ₹${approvedLimit}`);
-        navigate("/dashboard");
+        navigate("/zap-pay-later");
       } else {
         toast.error("Sorry, you’re not eligible for ZupPayLater at this time.");
         navigate("/dashboard");

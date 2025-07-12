@@ -69,24 +69,28 @@ const ZapPayLaterDashboard = () => {
         usedCredit: increment(amt),
         wallet: increment(amt),
       });
-
-      // record transaction in paylaterTransactions
-      await addDoc(collection(db, "users", user.uid, "paylaterTransactions"), {
+       const txnRef =  await addDoc(collection(db, "users", user.uid, "paylaterTransactions"), {
         amount: amt,
         timestamp: serverTimestamp(),
         note: "Used ZupPayLater credit",
-        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // due in 30 days
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         status: "due",
         type: "credit",
       });
+      await updateDoc(txnRef, { id: txnRef.id });
+
 
       await addDoc(collection(db, "users", user.uid, "transactions"), {
-        amount: amt,
-        timestamp: serverTimestamp(),
-        note: "ZupPayLater credit",
-        status: "success",
-        type: "paylater",
+      amount: amt,
+      timestamp: serverTimestamp(),
+      note: "ZupPayLater credit",
+      status: "success",
+      type: "paylater",
+      id:txnRef.id,
+
       });
+  
+
 
       toast.success(`₹${amt} added to wallet from ZupPayLater!`);
       setAmountToUse("");
