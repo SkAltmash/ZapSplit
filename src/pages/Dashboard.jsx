@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiSend,
@@ -6,6 +6,7 @@ import {
   FiCreditCard,
   FiRefreshCw,
   FiBell,
+  FiShield,
 } from "react-icons/fi";
 import QRCode from "react-qr-code";
 import { auth, db } from "../firebase";
@@ -17,6 +18,7 @@ import Footer from "../components/Footer";
 import DashboardUsers from "./DashboardUsers";
 import ZupPayLaterCard from "../components/ZupPayLaterCard";
 import ReferralProgram from "../components/ReferralProgram";
+
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [balance, setBalance] = useState(0);
@@ -26,7 +28,7 @@ const Dashboard = () => {
   const [upi, setUpi] = useState("");
   const navigate = useNavigate();
 
-  const fetchBalance = async (uid) => {
+  const fetchUserData = async (uid) => {
     try {
       setLoadingBalance(true);
       const ref = doc(db, "users", uid);
@@ -35,13 +37,14 @@ const Dashboard = () => {
         const data = snap.data();
         setBalance(data.wallet || 0);
         setUpi(data.upi || "upi_not_set@example.com");
+        setUser({ uid, ...data });
       } else {
         setBalance(0);
         setUpi("upi_not_set@example.com");
       }
     } catch (err) {
-      console.error("Error fetching balance:", err);
-      toast.error("Failed to fetch balance");
+      console.error("Error fetching user data:", err);
+      toast.error("Failed to fetch user data");
     } finally {
       setLoadingBalance(false);
     }
@@ -62,8 +65,7 @@ const Dashboard = () => {
 
     const unsub = auth.onAuthStateChanged(async (u) => {
       if (u) {
-        setUser(u);
-        await fetchBalance(u.uid);
+        await fetchUserData(u.uid);
       } else {
         navigate("/login");
       }
@@ -82,14 +84,26 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="min-h-screen mt-10 px-4 py-8 md:px-10 bg-white dark:bg-[#0d0d0d] text-gray-800 dark:text-white">
-        <motion.h1
+     <div className="min-h-screen mt-10 px-4 py-8 md:px-10 bg-white dark:bg-[#0d0d0d] text-gray-800 dark:text-white">
+         {user?.role === "admin" && (
+          <div className="w-full flex justify-center">
+              <motion.button
+            whileHover={{ scale: 1.05 }}
+            onClick={() => navigate("/admin")}
+            className="mt-4 bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded shadow hover:shadow-lg transition flex items-center gap-2"
+          >
+            <FiShield className="text-lg" />
+            Admin Dashboard
+          </motion.button> 
+          </div>
+        )}
+        <motion.h1 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
           className="text-3xl font-bold mb-2"
         >
-          {greeting}, <span className="text-purple-600">{user.displayName}</span>!
+          {greeting}, <span className="text-purple-600">{user.name}</span>!
         </motion.h1>
 
         <motion.div
@@ -114,11 +128,10 @@ const Dashboard = () => {
               </motion.h2>
             )}
           </div>
-          
 
           <div className="flex flex-col gap-2 items-center">
             <button
-              onClick={() => fetchBalance(user.uid)}
+              onClick={() => fetchUserData(user.uid)}
               className="text-white hover:text-white/70 transition"
               title="Refresh Balance"
             >
@@ -131,6 +144,8 @@ const Dashboard = () => {
             )}
           </div>
         </motion.div>
+
+      
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10">
           {/* Send */}
@@ -167,6 +182,7 @@ const Dashboard = () => {
             </span>
           </motion.button>
         </div>
+          
 
         <DashboardUsers />
         <ZupPayLaterCard />
@@ -203,7 +219,7 @@ const Dashboard = () => {
                   bgColor="transparent"
                 />
               </div>
-              <p className="text-xs text-center mt-2 text-gray-500  dark:text-gray-300 break-all">
+              <p className="text-xs text-center mt-2 text-gray-500 dark:text-gray-300 break-all">
                 {upi}
               </p>
               <button

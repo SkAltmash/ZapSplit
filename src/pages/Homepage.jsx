@@ -23,7 +23,9 @@ function Homepage() {
       </div>
     );
   }
- return user ? <Dashboard /> : <PublicHomepage />;
+ return user ? <>
+
+ <Dashboard /></> : <PublicHomepage />;
 }
 
 export default Homepage
