@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiSend,
@@ -114,6 +114,7 @@ const Dashboard = () => {
               </motion.h2>
             )}
           </div>
+          
 
           <div className="flex flex-col gap-2 items-center">
             <button
