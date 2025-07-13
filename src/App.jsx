@@ -32,6 +32,11 @@ import PayLaterTransactionDetails from './pages/PayLaterTransactionDetails';
 import PayDue from './pages/PayDue';
 import ExtendDue from './pages/ExtendDue';
 import ReferralDetails from './pages/ReferralDetails';
+import AdminDashboard from './pages/ AdminDashboard';
+import AdminNotifications from './pages/AdminNotifications';
+import AdminUsersPage from './pages/AdminUsersPage';
+import AdminUserDetail from './pages/AdminUserDetail';
+
 function App() {
   return (
     <>
@@ -68,7 +73,10 @@ function App() {
       <Route path="/pay-due/:txnId" element={<PayDue />} />
       <Route path="/extend-due/:txnId" element={<ExtendDue />} />
       <Route path="/referral-details" element={<ReferralDetails />} />
-
+      <Route path='/admin' element={<AdminDashboard />} />
+      <Route path="/admin/notifications" element={<AdminNotifications />} />
+      <Route path='/admin/users' element={<AdminUsersPage />} />
+      <Route path="/admin/users/:id" element={<AdminUserDetail /> } />
       {/* Catch-all route for 404 */}
       <Route path="*" element={<div className="text-center mt-20 text-gray-600 dark:text-gray-300 ">Page not found</div>} />
 

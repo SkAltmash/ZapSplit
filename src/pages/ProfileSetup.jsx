@@ -15,7 +15,7 @@ const avatarOptions = [
 ];
 
 const CLOUD_NAME = "dnaftbdo8";
-const UPLOAD_PRESET = "unsigned_zapsplit"; // 🔷 Create this in your Cloudinary dashboard!
+const UPLOAD_PRESET = "unsigned_zapsplit"; 
 
 const ProfileSetup = () => {
   const user = auth.currentUser;

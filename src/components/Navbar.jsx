@@ -15,6 +15,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { Link } from "react-router-dom";
 import Notifications from "./Notifications";
 import SplitButton from "./SplitButton";
+import { User } from "lucide-react";
 
 const Navbar = () => {
   const [darkMode, setDarkMode] = useState(
@@ -287,7 +288,7 @@ const Navbar = () => {
                       <FiHelpCircle /> Help
                     </span>
                   </Link>
-
+                 
                   <button
                     onClick={handleLogout}
                     className="text-sm font-medium text-red-600 border border-red-300 dark:border-red-400 px-4 py-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-800/20 transition"
