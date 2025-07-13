@@ -90,7 +90,7 @@ const Signup = () => {
   }, [form.referralCode]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0d0d0d] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white mt-12 py-4 dark:bg-[#0d0d0d] flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
@@ -129,7 +129,6 @@ const Signup = () => {
               required
               value={form.mobile}
               onChange={handleChange}
-              placeholder="10-digit number"
               className="w-full px-4 py-2 rounded-md bg-white dark:bg-[#1c1c1c] border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>

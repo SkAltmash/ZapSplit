@@ -49,23 +49,21 @@ It also features a **powerful Admin Dashboard** to manage users, notifications, 
 | **date-fns**                | Dates & relative time formatting  |
 
 ---
-
 ## 📷 Screenshots
 
-✅ User Dashboard (Wallet, PayLater, Transactions)  
+✅ **Landing Page**  
+![Landing Page](public/screenshots/s1.jpg)
 
-✅ Admin Panel (Users, Notifications, Analytics)  
-✅ Analytics Charts  
-✅ Mobile Responsive & Dark Mode  
+✅ **User Dashboard**  
+![User Dashboard](public/screenshots/s3.jpg)
 
-*(Add screenshots here if you want)*
+✅ **Payment Flow**  
+![Payment Flow](public/screenshots/s4.jpg)
 
----
+✅ **Send Page**  
+![Send Page](public/screenshots/s5.jpg)
 
-## 🚀 Setup & Run Locally
-
-```bash
-git clone https://github.com/yourusername/zapsplit.git
-cd zapsplit
-npm install
-npm run dev
+✅ **ZapPayLater**  
+![ZapPayLater](public/screenshots/s6.jpg)
+✅ **Admin Dashboard**  
+![Admin Dashboard](public/screenshots/s7.jpg)

@@ -8,21 +8,21 @@ import {
   FiBarChart2,
   FiCamera,
   FiHelpCircle,
+  FiShield,
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { Link } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
 import Notifications from "./Notifications";
 import SplitButton from "./SplitButton";
-import { User } from "lucide-react";
 
 const Navbar = () => {
-  const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("theme") === "dark"
-  );
+  const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "dark");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   const popoverRef = useRef();
@@ -33,7 +33,18 @@ const Navbar = () => {
   }, [darkMode]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
+    const unsubscribe = onAuthStateChanged(auth, async (u) => {
+      if (u) {
+        setUser(u);
+        const snap = await getDoc(doc(db, "users", u.uid));
+        if (snap.exists()) {
+          setUserRole(snap.data().role || "user");
+        }
+      } else {
+        setUser(null);
+        setUserRole(null);
+      }
+    });
     return () => unsubscribe();
   }, []);
 
@@ -143,6 +154,18 @@ const Navbar = () => {
                         </span>
                       </Link>
 
+                      {userRole === "admin" && (
+                        <Link
+                          to="/admin"
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#333]"
+                          onClick={() => setPopoverOpen(false)}
+                        >
+                          <span className="inline-flex items-center gap-2">
+                            <FiShield /> Admin
+                          </span>
+                        </Link>
+                      )}
+
                       <button
                         onClick={() => {
                           toggleDarkMode();
@@ -249,46 +272,27 @@ const Navbar = () => {
 
                   <div className="border-t border-gray-200 dark:border-white/10 my-4" />
 
-                  <Link
-                    onClick={toggleDrawer}
-                    to="/profile"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
-                  >
-                    <span className="inline-flex items-center gap-2">
-                      <FiUser /> Profile
-                    </span>
+                  <Link onClick={toggleDrawer} to="/profile" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition">
+                    <span className="inline-flex items-center gap-2"><FiUser /> Profile</span>
                   </Link>
 
-                  <Link
-                    onClick={toggleDrawer}
-                    to="/analysis"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
-                  >
-                    <span className="inline-flex items-center gap-2">
-                      <FiBarChart2 /> Analysis
-                    </span>
+                  <Link onClick={toggleDrawer} to="/analysis" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition">
+                    <span className="inline-flex items-center gap-2"><FiBarChart2 /> Analysis</span>
                   </Link>
 
-                  <Link
-                    onClick={toggleDrawer}
-                    to="/scan-pay"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
-                  >
-                    <span className="inline-flex items-center gap-2">
-                      <FiCamera /> Scan & Pay
-                    </span>
+                  {userRole === "admin" && (
+                    <Link onClick={toggleDrawer} to="/admin" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition">
+                      <span className="inline-flex items-center gap-2"><FiShield /> Admin</span>
+                    </Link>
+                   )}
+                  <Link onClick={toggleDrawer} to="/scan-pay" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition">
+                    <span className="inline-flex items-center gap-2">   <FiCamera /> Scan & Pay</span>
                   </Link>
-
-                  <Link
-                    to="/help"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition"
-                    onClick={toggleDrawer}
-                  >
-                    <span className="inline-flex items-center gap-2">
-                      <FiHelpCircle /> Help
-                    </span>
+                   <Link onClick={toggleDrawer} to="/help" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition">
+                    <span className="inline-flex items-center gap-2"> <FiHelpCircle />Help</span>
                   </Link>
-                 
+                  
+   
                   <button
                     onClick={handleLogout}
                     className="text-sm font-medium text-red-600 border border-red-300 dark:border-red-400 px-4 py-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-800/20 transition"
